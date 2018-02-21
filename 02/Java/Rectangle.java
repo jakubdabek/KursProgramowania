@@ -5,12 +5,12 @@ public class Rectangle extends Tetragon {
     }
 
     @Override
-    public surfaceArea() {
+    public double surfaceArea() {
         return sideLengths[0] * sideLengths[1];
     }
 
     @Override
-    public perimeter() {
+    public double perimeter() {
         return 2 * sideLengths[0] + 2 * sideLengths[1];
     }
 

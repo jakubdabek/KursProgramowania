@@ -13,9 +13,13 @@ public abstract class Tetragon extends Shape {
 
         for (int i = 0; i < 4; i++) {
             if (sideLengths[i] <= 0) {
-                throw new IllegalArgumentException("Side length must be positive");
+                throw new UnsupportedOperationException("Side length must be positive");
             }
         }
+    }
+    
+    static boolean areDoublesMoreOrLessEqual(double a, double b) {
+        return Math.abs(a - b) < 0.000000001;
     }
 
     public static Tetragon makeTetragon(
@@ -25,21 +29,21 @@ public abstract class Tetragon extends Shape {
         double side4, 
         double angleInDegrees) {
 
-        if (side1 == side3 && side2 == side4) {
-            if (side1 == side2) {
-                if (angleInDegrees == 90.0) {
+        if (areDoublesMoreOrLessEqual(side1, side3) && areDoublesMoreOrLessEqual(side2, side4)) {
+            if (areDoublesMoreOrLessEqual(side1, side2)) {
+                if (areDoublesMoreOrLessEqual(angleInDegrees, 90.0)) {
                     return new Square(side1);
                 }
                 else {
                     return new Rhombus(side1, angleInDegrees / 180.0 * Math.PI);
                 }
             }
-            else if (angleInDegrees == 90.0) {
+            else if (areDoublesMoreOrLessEqual(angleInDegrees, 90.0)) {
                 return new Rectangle(side1, side2);
             }
         }
 
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
 }

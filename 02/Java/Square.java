@@ -5,12 +5,12 @@ public class Square extends Tetragon {
     }
 
     @Override
-    public surfaceArea() {
+    public double surfaceArea() {
         return sideLengths[0] * sideLengths[0];
     }
 
     @Override
-    public perimeter() {
+    public double perimeter() {
         return 4 * sideLengths[0];
     }
 

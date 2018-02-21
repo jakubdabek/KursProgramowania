@@ -4,7 +4,7 @@ public class Circle extends Shape {
 
     public Circle(double radius) {
         this.radius = radius;
-        if (sideLength < 0)
+        if (radius < 0)
             throw new IllegalArgumentException("Radius cannot be negative");
     }
 

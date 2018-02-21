@@ -12,7 +12,7 @@ public class Test {
         List<Shape> shapes = new ArrayList<>();
         int i = 1;
         try {
-            for (char c : args[0]) {
+            for (char c : args[0].toCharArray()) {
                 double[] tmp = new double[5];
 
                 switch (c) {
@@ -21,7 +21,7 @@ public class Test {
                         tmp[j] = Double.parseDouble(args[i + j]);
                     }
                     i += 5;
-                    shapes.add(Tetragon.makeTetragon(tmp[0], tmp[1], tmp[2], tmp[3], tmp[4]);
+                    shapes.add(Tetragon.makeTetragon(tmp[0], tmp[1], tmp[2], tmp[3], tmp[4]));
                     break;
                 case 'p':
                     tmp[0] = Double.parseDouble(args[i]);

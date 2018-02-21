@@ -4,7 +4,7 @@ public class Pentagon extends Shape {
 
     public double sideLength;
 
-    public Pentagon(int sideLength) {
+    public Pentagon(double sideLength) {
         this.sideLength = sideLength;
         if (sideLength < 0)
             throw new IllegalArgumentException("Side length cannot be negative");
