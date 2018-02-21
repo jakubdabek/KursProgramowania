@@ -43,7 +43,12 @@ public abstract class Tetragon extends Shape {
             }
         }
 
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("This is not a square, rectangle, or rhombus: \n"
+            + side1 + " "
+            + side2 + " "
+            + side3 + " "
+            + side4 + " "
+            + angleInDegrees + " ");
     }
 
 }

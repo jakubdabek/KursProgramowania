@@ -46,7 +46,15 @@ public class Test {
         } catch (NumberFormatException e) {
             System.out.println("Not every argument is a number");
         }
+
+        for (Shape shape : shapes) {
+            System.out.println(
+                shape.getClass().getName() 
+                + " with area " + shape.surfaceArea()
+                + " and perimeter " + shape.perimeter());
+        }
     }
+
 }
                     
                     
