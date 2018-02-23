@@ -35,7 +35,7 @@ class PascalTriangleRow
     }
 };
 
-bool get_int(const char* str, int &n)
+bool parse_int(const char* str, int &n)
 {
     static std::stringstream stream;
     stream.clear();
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     using std::cout;
 
     int n;
-    if (get_int(argv[1], n))
+    if (parse_int(argv[1], n))
     {
         try
         {
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
                 try
                 {
                     int m;
-                    if (get_int(argv[i], m))
+                    if (parse_int(argv[i], m))
                     {
                         int tmp = row.column(m);
                         cout << m << " - " << tmp << "\n";

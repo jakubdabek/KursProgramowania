@@ -1,4 +1,4 @@
-CC = clang++
+CXX = clang++
 CXXFLAGS = -Wall --pedantic -std=c++1z -g
 JAVANAMES := $(wildcard *.java)
 
@@ -14,7 +14,7 @@ Test.class:
 	javac Test.java
 
 program: PascalTriangleRow.cpp
-	$(CC) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean: 
 	rm -f program $(patsubst %.java,%.class,$(JAVANAMES))
