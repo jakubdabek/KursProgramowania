@@ -1,26 +1,21 @@
 CXX = clang++
-CXXFLAGS = -Wall --pedantic -std=c++1z
+CXXFLAGS = -Wall --pedantic -std=c++1z -g
 JAVANAMES := $(wildcard *.java)
 
 test: all
 	@echo -e '\nJava:'
-	java Test 14 0 2 4 8 -1 aaaa
-	@echo -ne '\n'
-	java Test -4 8 2
-
-	@echo -e '\n\nC++:'
-	./program 14 0 2 4 8 -1 aaaa
-	@echo -ne '\n'
-	./program -4 8 2
+	java Test 4 0 1 8 -1 aaaaa
+	@echo -e '\nc++:'
+	./program 4 0 1 8 -1 aaaaa
 
 all: Test.class program
 
 Test.class: Test.java
 	javac Test.java
-Test.java: PrimeNumbers.java
+Test.java: PascalTriangleRow.java
 	@touch $@
 
-program: PrimeNumbers.cpp
+program: PascalTriangleRow.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 clean: 

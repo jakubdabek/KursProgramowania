@@ -9,13 +9,13 @@ class PascalTriangleRow
     std::vector<int> values;
 
   public:
-    int rowIndex;
+    int row_index;
 
-    PascalTriangleRow(int n) : rowIndex{n}
+    PascalTriangleRow(int n) : row_index{n}
     {
         if (n < 0)
             throw std::domain_error(std::to_string(n) + " - Wrong row index");
-        rowIndex = n;
+        row_index = n;
         values.resize(n + 1);
         values[0] = 1;
         values[values.size() - 1] = 1;
