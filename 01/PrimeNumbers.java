@@ -11,9 +11,9 @@ public class PrimeNumbers {
         values[0] = false;
         values[1] = false;
 
-        for (int i = 2; i < Math.sqrt(n); i++) {
+        for (int i = 2; i <= Math.sqrt(n + 1); i++) {
             if (values[i]) {
-                for (int j = i * i; j < n; j += i) {
+                for (int j = i * i; j <= n; j += i) {
                     values[j] = false;
                 }
             }
