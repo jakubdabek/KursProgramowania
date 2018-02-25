@@ -1,4 +1,5 @@
 public class Test {
+
     public static void main(String[] args) {
         try {
             int n = Integer.parseInt(args[0]);
@@ -19,4 +20,5 @@ public class Test {
             System.out.println(e.getMessage());
         }
     }
+
 }

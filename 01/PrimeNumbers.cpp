@@ -7,35 +7,37 @@
 
 class PrimeNumbers
 {
-    std::vector<bool> values;
+    std::vector<int> values;
 
   public:
-    PrimeNumbers(int n) : values(n + 1, true)
+    PrimeNumbers(int n)
     {
         if (n < 0)
             throw std::domain_error(std::to_string(n) + " - Wrong index");
-        values[0] = false;
-        values[1] = false;
+        
+        std::vector<bool> sieve(n + 1, true);
+        sieve[0] = false;
+        sieve[1] = false;
 
         for (int i = 2; i <= std::sqrt(n + 1); i++) {
-            if (values[i]) {
+            if (sieve[i]) {
                 for (int j = i * i; j <= n; j += i) {
-                    values[j] = false;
+                    sieve[j] = false;
                 }
             }
+        }
+
+        for(int i = 0; i < sieve.size(); i++)
+        {
+            if(sieve[i]) values.emplace_back(i);
         }
     }
 
     int number(int m) const
-    {
-        int counter = m;
-        for (int i = 0; i < values.size(); i++)
-        {
-            if (values[i] && --counter == -1)
-                return i;
-        }
-        
-        throw std::domain_error(std::to_string(m) + " - Number index out of bounds");
+    {        
+        if(m >= values.size())
+            throw std::domain_error(std::to_string(m) + " - Number index out of bounds");
+        return values[m];
     }
 };
 
