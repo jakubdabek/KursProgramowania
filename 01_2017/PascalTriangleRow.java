@@ -1,9 +1,10 @@
 public class PascalTriangleRow {
+
     public int rowIndex;
     public int[] values;
 
     public PascalTriangleRow(int n) throws IndexOutOfBoundsException {
-        if(n < 0)
+        if (n < 0)
             throw new IndexOutOfBoundsException(n + " - Wrong row index");
         rowIndex = n;
         values = new int[n + 1];
@@ -17,9 +18,10 @@ public class PascalTriangleRow {
     }
 
     public int column(int m) {
-        if(m < values.length && m >= 0)
+        if (m < values.length && m >= 0)
             return values[m];
         else
             throw new IndexOutOfBoundsException(m + " - Column index out of bounds");
     }
+
 }

@@ -4,9 +4,9 @@
 
 class Rectangle : public Tetragon
 {
-public:
+  public:
     Rectangle(double side1, double side2);
-    const char* name() noexcept override { return "Rectangle"; }
-    double surface_area() noexcept override;
-    double perimeter() noexcept override;
+    const char* name() const noexcept override { return "Rectangle"; }
+    double surface_area() const noexcept override;
+    double perimeter() const noexcept override;
 };

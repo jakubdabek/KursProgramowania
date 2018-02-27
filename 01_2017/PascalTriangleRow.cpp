@@ -11,7 +11,7 @@ class PascalTriangleRow
   public:
     int row_index;
 
-    PascalTriangleRow(int n) : row_index{n}
+    explicit PascalTriangleRow(int n) : row_index{n}
     {
         if (n < 0)
             throw std::domain_error(std::to_string(n) + " - Wrong row index");
@@ -27,7 +27,7 @@ class PascalTriangleRow
         }
     }
 
-    int column(int m)
+    int column(int m) const
     {
         if (m < 0 || m >= values.size())
             throw std::domain_error(std::to_string(m) + " - Column index out of bounds");
@@ -35,7 +35,7 @@ class PascalTriangleRow
     }
 };
 
-bool parse_int(const char* str, int &n)
+bool parse_int(std::string str, int &n)
 {
     static std::stringstream stream;
     stream.clear();
@@ -69,13 +69,13 @@ int main(int argc, char *argv[])
                         cout << argv[i] << " is not a number\n";
                     }
                 }
-                catch(std::domain_error e)
+                catch (std::domain_error &e)
                 {
                     cout << e.what() << "\n";
                 }
             }
         }
-        catch(std::domain_error e)
+        catch (std::domain_error &e)
         {
             cout << e.what() << "\n";
         }

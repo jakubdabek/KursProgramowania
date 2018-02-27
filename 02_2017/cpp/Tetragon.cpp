@@ -31,7 +31,6 @@ std::unique_ptr<Tetragon> Tetragon::make_tetragon(
     double side4,
     double angleInDegrees)
 {
-
     if (are_doubles_moreorless_equal(side1, side3) && are_doubles_moreorless_equal(side2, side4))
     {
         if (are_doubles_moreorless_equal(side1, side2))

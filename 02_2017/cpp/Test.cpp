@@ -11,10 +11,10 @@
 #include <memory>
 #include <vector>
 
-using std::literals::operator ""s;
+using std::literals::operator""s;
 
 template <typename T>
-bool parse(const char *str, T &x)
+bool parse(std::string str, T &x)
 {
     static std::stringstream stream;
     stream.clear();
@@ -24,7 +24,7 @@ bool parse(const char *str, T &x)
 }
 
 template <typename T>
-void parse_with_validation(const char *str, T &x)
+void parse_with_validation(std::string str, T &x)
 {
     if (!parse(str, x))
     {
@@ -37,9 +37,10 @@ int main(int argc, char *argv[])
     using std::cout;
 
     std::vector<std::unique_ptr<Shape>> shapes;
-    int i = 2;
+
     try
     {
+        int i = 2;
         for (auto c : std::string{argv[1]})
         {
             double tmp[5];
@@ -75,7 +76,7 @@ int main(int argc, char *argv[])
             }
         }
     }
-    catch (std::invalid_argument e)
+    catch (std::invalid_argument &e)
     {
         cout << e.what();
     }

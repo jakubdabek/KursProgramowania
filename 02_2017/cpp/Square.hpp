@@ -4,9 +4,9 @@
 
 class Square : public Tetragon
 {
-public:
-    Square(double sideLength);
-    const char* name() noexcept override { return "Square"; }
-    double surface_area() noexcept override;
-    double perimeter() noexcept override;
+  public:
+    explicit Square(double sideLength);
+    const char* name() const noexcept override { return "Square"; }
+    double surface_area() const noexcept override;
+    double perimeter() const noexcept override;
 };

@@ -4,10 +4,10 @@
 
 class Rhombus : public Tetragon
 {
-public:
+  public:
     using radian = double;
     Rhombus(double sideLength, radian angle);
-    const char* name() noexcept override { return "Rhombus"; }
-    double surface_area() noexcept override;
-    double perimeter() noexcept override;
+    const char* name() const noexcept override { return "Rhombus"; }
+    double surface_area() const noexcept override;
+    double perimeter() const noexcept override;
 };

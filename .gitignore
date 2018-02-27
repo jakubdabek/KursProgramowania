@@ -1,8 +1,14 @@
+# build
 *.obj
 *.o
 *.out
 *.class
 
+# debug and analysis output
+*.gch
+*.plist
+
+# directories
 Wyklady/
 playground/
 .vscode/

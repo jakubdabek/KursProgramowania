@@ -4,12 +4,12 @@
 
 class Circle : public Shape
 {
-public:
-    Circle(double radius);
-    const char* name() noexcept override { return "Circle"; }
-    double surface_area() noexcept override;
-    double perimeter() noexcept override;
+  public:
+    explicit Circle(double radius);
+    const char* name() const noexcept override { return "Circle"; }
+    double surface_area() const noexcept override;
+    double perimeter() const noexcept override;
 
-public:
+  public:
     const double radius;
 };
