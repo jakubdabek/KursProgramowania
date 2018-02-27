@@ -7,6 +7,7 @@
 
 class PrimeNumbers
 {
+  private:
     std::vector<int> values;
 
   public:
@@ -39,7 +40,7 @@ class PrimeNumbers
 
     int number(int m) const
     {
-        if (m >= values.size())
+        if (m < 0 || m >= values.size())
             throw std::domain_error(std::to_string(m) + " - Number index out of bounds");
         return values[m];
     }
@@ -58,20 +59,18 @@ int main(int argc, char *argv[])
 {
     using std::cout;
 
-    int n;
-    if (parse_int(argv[1], n))
+    if (int n; parse_int(argv[1], n))
     {
         try
         {
-            PrimeNumbers row(n);
+            PrimeNumbers numbers(n);
             for (int i = 2; i < argc; i++)
             {
                 try
                 {
-                    int m;
-                    if (parse_int(argv[i], m))
+                    if (int m; parse_int(argv[i], m))
                     {
-                        int tmp = row.number(m);
+                        auto tmp = numbers.number(m);
                         cout << m << " - " << tmp << "\n";
                     }
                     else

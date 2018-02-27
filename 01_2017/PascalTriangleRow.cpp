@@ -6,16 +6,17 @@
 
 class PascalTriangleRow
 {
+  private:
     std::vector<int> values;
 
   public:
-    int row_index;
+    const int row_index;
 
     explicit PascalTriangleRow(int n) : row_index{n}
     {
         if (n < 0)
             throw std::domain_error(std::to_string(n) + " - Wrong row index");
-        row_index = n;
+
         values.resize(n + 1);
         values[0] = 1;
         values[values.size() - 1] = 1;
@@ -48,8 +49,7 @@ int main(int argc, char *argv[])
 {
     using std::cout;
 
-    int n;
-    if (parse_int(argv[1], n))
+    if (int n; parse_int(argv[1], n))
     {
         try
         {
@@ -58,8 +58,7 @@ int main(int argc, char *argv[])
             {
                 try
                 {
-                    int m;
-                    if (parse_int(argv[i], m))
+                    if (int m; parse_int(argv[i], m))
                     {
                         int tmp = row.column(m);
                         cout << m << " - " << tmp << "\n";

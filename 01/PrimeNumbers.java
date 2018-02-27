@@ -3,14 +3,12 @@ import java.util.List;
 
 public class PrimeNumbers {
 
-    public int rowIndex;
-    public List<Integer> values;
+    private List<Integer> values;
 
     public PrimeNumbers(int n) {
         if (n < 0)
             throw new IndexOutOfBoundsException(n + " - Wrong index");
 
-        rowIndex = n;
         boolean[] sieve = new boolean[n + 1];
         for (int i = 0; i < sieve.length; i++)
             sieve[i] = true;
@@ -33,7 +31,7 @@ public class PrimeNumbers {
     }
 
     public int number(int m) {
-        if (m > values.size())
+        if (m < 0 || m >= values.size())
             throw new IndexOutOfBoundsException(m + " - Number index out of bounds");
         return values.get(m);
     }

@@ -43,9 +43,7 @@ int main(int argc, char *argv[])
         int i = 2;
         for (auto c : std::string{argv[1]})
         {
-            double tmp[5];
-
-            switch (c)
+            switch (double tmp[5]; c)
             {
             case 't':
                 for (int j = 0; j < 5; j++)
