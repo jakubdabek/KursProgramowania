@@ -4,12 +4,12 @@ JAVANAMES := $(wildcard *.java)
 
 test: all
 	@echo -e '\nJava:'
-	java Test 14 0 2 4 8 -1 aaaa
+	java Test 14 0 2 4 8 -1 aaaa 3asd 05 0x04 xd
 	@echo -ne '\n'
 	java Test -4 8 2
 
 	@echo -e '\n\nC++:'
-	./program 14 0 2 4 8 -1 aaaa
+	./program 14 0 2 4 8 -1 aaaa 3asd 05 0x04 xd
 	@echo -ne '\n'
 	./program -4 8 2
 

@@ -14,7 +14,7 @@ class PrimeNumbers
     explicit PrimeNumbers(int n)
     {
         if (n < 0)
-            throw std::domain_error(std::to_string(n) + " - Wrong index");
+            throw std::invalid_argument(std::to_string(n) + " - Wrong index");
 
         std::vector<bool> sieve(n + 1, true);
         sieve[0] = false;
@@ -41,7 +41,7 @@ class PrimeNumbers
     int number(int m) const
     {
         if (m < 0 || m >= values.size())
-            throw std::domain_error(std::to_string(m) + " - Number index out of bounds");
+            throw std::invalid_argument(std::to_string(m) + " - Number index out of bounds");
         return values[m];
     }
 };
@@ -52,7 +52,7 @@ bool parse_int(std::string str, int &n)
     stream.clear();
     stream.str(str);
     stream >> n;
-    return !stream.fail();
+    return !stream.fail() && stream.eof();
 }
 
 int main(int argc, char *argv[])
@@ -78,13 +78,13 @@ int main(int argc, char *argv[])
                         cout << argv[i] << " is not an integer\n";
                     }
                 }
-                catch (std::domain_error &e)
+                catch (std::invalid_argument &e)
                 {
                     cout << e.what() << "\n";
                 }
             }
         }
-        catch (std::domain_error &e)
+        catch (std::invalid_argument &e)
         {
             cout << e.what() << "\n";
         }

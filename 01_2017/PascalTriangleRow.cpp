@@ -42,7 +42,7 @@ bool parse_int(std::string str, int &n)
     stream.clear();
     stream.str(str);
     stream >> n;
-    return !stream.fail();
+    return !stream.fail() && stream.eof();
 }
 
 int main(int argc, char *argv[])
