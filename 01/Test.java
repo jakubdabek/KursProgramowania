@@ -1,6 +1,9 @@
 public class Test {
 
     public static void main(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Too few arguments");
+        }
         try {
             int n = Integer.parseInt(args[0]);
             PrimeNumbers numbers = new PrimeNumbers(n);

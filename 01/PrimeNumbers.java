@@ -9,6 +9,11 @@ public class PrimeNumbers {
         if (n < 0)
             throw new IndexOutOfBoundsException(n + " - Wrong index");
 
+        values = new ArrayList<>();
+
+        if (n == 0)
+            return;
+
         boolean[] sieve = new boolean[n + 1];
         for (int i = 0; i < sieve.length; i++)
             sieve[i] = true;
@@ -23,7 +28,6 @@ public class PrimeNumbers {
             }
         }
 
-        values = new ArrayList<>();
         for (int i = 0; i < sieve.length; i++) {
             if (sieve[i])
                 values.add(i);

@@ -15,6 +15,8 @@ class PrimeNumbers
     {
         if (n < 0)
             throw std::invalid_argument(std::to_string(n) + " - Wrong index");
+        if (n == 0)
+            return;
 
         std::vector<bool> sieve(n + 1, true);
         sieve[0] = false;
@@ -59,6 +61,11 @@ int main(int argc, char *argv[])
 {
     using std::cout;
 
+    if(argc < 1)
+    {
+        cout << "Too few arguments" << std::endl;
+        return EXIT_FAILURE;
+    }
     if (int n; parse_int(argv[1], n))
     {
         try
