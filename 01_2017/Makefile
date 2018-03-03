@@ -18,7 +18,7 @@ Test.java: PascalTriangleRow.java
 program: PascalTriangleRow.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-clean: 
+clean:
 	rm -f program $(patsubst %.java,%.class,$(JAVANAMES))
 
 PHONY: test all clean

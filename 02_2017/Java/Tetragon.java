@@ -17,16 +17,16 @@ public abstract class Tetragon extends Shape {
             }
         }
     }
-    
+
     static boolean areDoublesMoreOrLessEqual(double a, double b) {
         return Math.abs(a - b) < 0.000000001;
     }
 
     public static Tetragon makeTetragon(
-        double side1, 
-        double side2, 
-        double side3, 
-        double side4, 
+        double side1,
+        double side2,
+        double side3,
+        double side4,
         double angleInDegrees) {
 
         if (areDoublesMoreOrLessEqual(side1, side3) && areDoublesMoreOrLessEqual(side2, side4)) {

@@ -16,7 +16,7 @@ public class Test {
                 double[] tmp = new double[5];
 
                 switch (c) {
-                case 't': 
+                case 't':
                     for (int j = 0; j < 5; j++) {
                         tmp[j] = Double.parseDouble(args[i + j]);
                     }
@@ -49,51 +49,51 @@ public class Test {
 
         for (Shape shape : shapes) {
             System.out.println(
-                shape.getClass().getName() 
+                shape.getClass().getName()
                 + " with area " + shape.surfaceArea()
                 + " and perimeter " + shape.perimeter());
         }
     }
 
 }
-                    
-                    
-
-    
-    
-        
-    
-    
-    
-        
-    
 
 
-    
-    
-        
-    
-    
-    
-        
-    
 
 
-    
-    
-        
-    
-    
-    
-        
-    
 
 
-    
-    
-        
-    
-    
-    
-        
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
