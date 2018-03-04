@@ -14,7 +14,7 @@ public class Program {
                 else
                     System.out.println(n + " is not a positive number");
             } catch (NumberFormatException ex) {
-                System.out.println(s + " is not an integer");
+                System.err.println(s + " is not an integer");
             }
         }
     }

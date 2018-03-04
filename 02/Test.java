@@ -2,12 +2,12 @@ public class Test {
 
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Too few arguments");
+            System.err.println("Too few arguments");
             return;
         }
 
         if (args[0].compareToIgnoreCase("A") != 0 && args[0].compareToIgnoreCase("R") != 0) {
-            System.out.println(
+            System.err.println(
                     "Wrong arguments\n" +
                     "Put mode as the first argument: " +
                     "'R' for roman to arabic, 'A' for arabic to roman");
@@ -26,9 +26,9 @@ public class Test {
                     System.out.println(args[i] + " in roman is " + str);
                 }
             } catch (RomanArabicException e) {
-                System.out.println(e.getMessage());
+                System.err.println(e.getMessage());
             } catch (NumberFormatException e) {
-                System.out.println(args[i] + " is not an integer");
+                System.err.println(args[i] + " is not an integer");
             }
         }
     }

@@ -47,8 +47,11 @@ bool parse_int(std::string str, int &n)
 
 int main(int argc, char *argv[])
 {
-    using std::cout;
-
+    if(argc < 1)
+    {
+        std::cerr << "Too few arguments" << std::endl;
+        return EXIT_FAILURE;
+    }
     if (int n; parse_int(argv[1], n))
     {
         try
@@ -61,26 +64,26 @@ int main(int argc, char *argv[])
                     if (int m; parse_int(argv[i], m))
                     {
                         int tmp = row.column(m);
-                        cout << m << " - " << tmp << "\n";
+                        std::cout << m << " - " << tmp << "\n";
                     }
                     else
                     {
-                        cout << argv[i] << " is not a number\n";
+                        std::cerr << argv[i] << " is not a number\n";
                     }
                 }
                 catch (std::domain_error &e)
                 {
-                    cout << e.what() << "\n";
+                    std::cerr << e.what() << "\n";
                 }
             }
         }
         catch (std::domain_error &e)
         {
-            cout << e.what() << "\n";
+            std::cerr << e.what() << "\n";
         }
     }
     else
     {
-        cout << argv[1] << " is not a number\n";
+        std::cerr << argv[1] << " is not a number\n";
     }
 }

@@ -39,12 +39,12 @@ public class Test {
                     shapes.add(new Circle(tmp[0]));
                     break;
                 default:
-                    System.out.println("'" + c + "'" + " doesn't denote any shape");
+                    System.err.println("'" + c + "'" + " doesn't denote any shape");
                     return;
                 }
             }
         } catch (NumberFormatException e) {
-            System.out.println("Not every argument is a number");
+            System.err.println("Not every argument is a number");
         }
 
         for (Shape shape : shapes) {

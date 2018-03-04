@@ -9,15 +9,15 @@ public class Test {
                     int m = Integer.parseInt(args[i]);
                     System.out.println(m + " - " + row.column(m));
                 } catch (NumberFormatException e) {
-                    System.out.println(args[i] + " is not an integer");
+                    System.err.println(args[i] + " is not an integer");
                 } catch (IndexOutOfBoundsException e) {
-                    System.out.println(e.getMessage());
+                    System.err.println(e.getMessage());
                 }
             }
         } catch (NumberFormatException e) {
-            System.out.println(args[0] + " is not an integer");
+            System.err.println(args[0] + " is not an integer");
         } catch (IndexOutOfBoundsException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 

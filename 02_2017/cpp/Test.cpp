@@ -14,7 +14,7 @@
 using std::literals::operator""s;
 
 template <typename T>
-bool parse(std::string str, T &x)
+bool parse(const std::string &str, T &x)
 {
     static std::stringstream stream;
     stream.clear();
@@ -24,18 +24,16 @@ bool parse(std::string str, T &x)
 }
 
 template <typename T>
-void parse_with_validation(std::string str, T &x)
+void parse_with_validation(const std::string &str, T &x)
 {
     if (!parse(str, x))
     {
-        throw std::invalid_argument(str + " couldn't be parsed as "s + typeid(T).name());
+        throw std::invalid_argument(str + " couldn't be parsed as " + typeid(T).name());
     }
 }
 
 int main(int argc, char *argv[])
 {
-    using std::cout;
-
     std::vector<std::unique_ptr<Shape>> shapes;
 
     try
@@ -69,19 +67,19 @@ int main(int argc, char *argv[])
                 shapes.push_back(std::make_unique<Circle>(tmp[0]));
                 break;
             default:
-                cout << "'" + std::string(1, c) + "'" + " doesn't denote any shape";
+                std::cerr << "'" + std::string(1, c) + "'" + " doesn't denote any shape";
                 return EXIT_FAILURE;
             }
         }
     }
     catch (std::invalid_argument &e)
     {
-        cout << e.what();
+        std::cerr << e.what();
     }
 
     for (auto &shape : shapes)
     {
-        cout << shape->name()
+        std::cout << shape->name()
              << " with area " << shape->surface_area()
              << " and perimeter " << shape->perimeter() << "\n";
     }
