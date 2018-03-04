@@ -1,12 +1,12 @@
 test: all
-	java Program -24 ggh \"Hello world\" 56
+	java Program00 -24 ggh \"Hello world\" 56
 
-all: Program.class
+all: Program00.class
 
-Program.class: Program.java
-	javac Program.java
+Program00.class: Program00.java
+	javac Program00.java
 
 clean:
-	rm -f Program.class
+	rm -f Program00.class
 
 PHONY: all clean

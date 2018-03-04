@@ -4,15 +4,15 @@ JAVANAMES := $(wildcard *.java)
 
 test: all
 	@echo -e '\nJava:'
-	java Test 4 0 1 8 -1 aaaaa
+	java Program01_2017 4 0 1 8 -1 aaaaa
 	@echo -e '\nc++:'
 	./program 4 0 1 8 -1 aaaaa
 
-all: Test.class program
+all: Program01_2017.class program
 
-Test.class: Test.java
-	javac Test.java
-Test.java: PascalTriangleRow.java
+Program01_2017.class: Program01_2017.java
+	javac Program01_2017.java
+Program01_2017.java: PascalTriangleRow.java
 	@touch $@
 
 program: PascalTriangleRow.cpp

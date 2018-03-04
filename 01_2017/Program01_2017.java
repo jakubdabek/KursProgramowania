@@ -1,16 +1,13 @@
-public class Test {
+public class Program01_2017 {
 
     public static void main(String[] args) {
-        if (args.length < 1) {
-            System.out.println("Too few arguments");
-        }
         try {
             int n = Integer.parseInt(args[0]);
-            PrimeNumbers numbers = new PrimeNumbers(n);
+            PascalTriangleRow row = new PascalTriangleRow(n);
             for (int i = 1; i < args.length; i++) {
                 try {
                     int m = Integer.parseInt(args[i]);
-                    System.out.println(m + " - " + numbers.number(m));
+                    System.out.println(m + " - " + row.column(m));
                 } catch (NumberFormatException e) {
                     System.err.println(args[i] + " is not an integer");
                 } catch (IndexOutOfBoundsException e) {
