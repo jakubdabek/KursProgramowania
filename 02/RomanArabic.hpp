@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <utility>
 #include <string>
 #include <array>
 
@@ -13,5 +14,5 @@ class RomanArabic
     struct Exception : public std::invalid_argument { using invalid_argument::invalid_argument; };
 
   private:
-    static std::array<std::string, 21> numbers;
+    static std::array<std::pair<std::string, int>, 21> numbers;
 };

@@ -1,52 +1,50 @@
 #include "RomanArabic.hpp"
 
 #include <stdexcept>
-#include <exception>
+#include <utility>
 #include <string>
 #include <array>
 
-std::string RomanArabic::Arabic2Roman(int value)
+std::string RomanArabic::Arabic2Roman(int number)
 {
-    throw Exception{std::to_string(value) + " - dunno what to do with that :/"};
+    if (number <= 0 || number > 3999)
+        throw Exception{std::to_string(number) + " is out of range"};
+
+    std::string result;
+    for (const auto& [roman, value] : numbers)
+    {
+        if (number - value >= 0)
+        {
+            result += roman;
+            number -= value;
+        }
+    }
+
+    if (number != 0)
+        throw "Something very wrong happened";
+
+    return result;
 }
 
 int RomanArabic::Roman2Arabic(const std::string &str)
 {
-    int sum = 0, multiplier = 1000;
+    int sum = 0;
     int currentIndex = 0;
 
     bool canExist = true;
     for (int i = 0; i < numbers.size() / 3; i++) {
         bool rowUsed = false;
         for(int j = 0; j < 3; j++) {
-            if (str.find(numbers[3 * i + j], currentIndex) == currentIndex) {
+            if (auto [roman, value] = numbers[3*i+j]; str.find(roman, currentIndex) == currentIndex) {
                 if (rowUsed || !canExist)
                     throw Exception{"The roman numerals " + str + " have a wrong format"};
                 rowUsed = true;
                 canExist = j == 1 || i % 2 == 0;
-                currentIndex += numbers[3 * i + j].length();
-
-                if (i % 2 == 0) {
-                    sum += multiplier * (3 - j);
-                } else {
-                    switch (j) {
-                    case 0:
-                        sum += multiplier / 10 * 9;
-                        break;
-                    case 1:
-                        sum += multiplier / 2;
-                        break;
-                    case 2:
-                        sum += multiplier / 10 * 4;
-                        break;
-                    }
-                }
+                currentIndex += roman.length();
+                sum += value;
             }
-
         }
-        if (i % 2 == 1)
-            multiplier /= 10;
-        canExist = true;
+        canExist = canExist || i % 2 == 0;
     }
 
     if (currentIndex != str.size())
@@ -55,11 +53,11 @@ int RomanArabic::Roman2Arabic(const std::string &str)
     return sum;
 }
 
-std::array<std::string, 21> RomanArabic::numbers =
-    { "MMM", "MM", "M" ,
-      "CM" , "D" , "CD",
-      "CCC", "CC", "C" ,
-      "XC" , "L" , "XL",
-      "XXX", "XX", "X" ,
-      "IX" , "V" , "IV",
-      "III", "II", "I" };
+std::array<std::pair<std::string, int>, 21> RomanArabic::numbers
+    {{{"MMM", 3000}, {"MM", 2000}, { "M", 1000},
+      { "CM",  900}, { "D",  500}, {"CD",  400},
+      {"CCC",  300}, {"CC",  200}, { "C",  100},
+      { "XC",   90}, { "L",   50}, {"XL",   40},
+      {"XXX",   30}, {"XX",   20}, { "X",   10},
+      { "IX",    9}, { "V",    5}, {"IV",    4},
+      {"III",    3}, {"II",    2}, { "I",    1}}};
