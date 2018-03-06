@@ -29,31 +29,35 @@ std::string RomanArabic::Arabic2Roman(int number)
 int RomanArabic::Roman2Arabic(const std::string &str)
 {
     int sum = 0;
-    int currentIndex = 0;
+    int current_index = 0;
+    bool was_compound = false; // for combinations of symbols with one of lower value before one of higher e.g. IX, IV
 
-    bool canExist = true;
-    for (int i = 0; i < numbers.size() / 3; i++) {
-        bool rowUsed = false;
-        for(int j = 0; j < 3; j++) {
-            if (auto [roman, value] = numbers[3*i+j]; str.find(roman, currentIndex) == currentIndex) {
-                if (rowUsed || !canExist)
+    for (int i = 0; i < numbers.size() / 3; i++)
+    {
+        bool row_used = false; // a row is 3 elements, see definition of numbers (if it is still formatted right)
+        for (int j = 0; j < 3; j++)
+        {
+            const auto& [roman, value] = numbers[3 * i + j];
+            if (str.find(roman, current_index) == current_index)
+            {
+                if (row_used || was_compound)
                     throw Exception{"The roman numerals " + str + " have a wrong format"};
-                rowUsed = true;
-                canExist = j == 1 || i % 2 == 0;
-                currentIndex += roman.length();
+                row_used = true;
+                was_compound = i % 2 == 1 && j != 1;
+                current_index += roman.length();
                 sum += value;
             }
         }
-        canExist = canExist || i % 2 == 0;
+        was_compound = was_compound && i % 2 == 1;
     }
 
-    if (currentIndex != str.size())
+    if (current_index != str.size())
         throw Exception{"The roman numerals " + str + " have a wrong format"};
 
     return sum;
 }
 
-std::array<std::pair<std::string, int>, 21> RomanArabic::numbers
+const std::array<std::pair<std::string, int>, 21> RomanArabic::numbers
     {{{"MMM", 3000}, {"MM", 2000}, { "M", 1000},
       { "CM",  900}, { "D",  500}, {"CD",  400},
       {"CCC",  300}, {"CC",  200}, { "C",  100},

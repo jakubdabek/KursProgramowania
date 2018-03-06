@@ -2,8 +2,8 @@
 
 #include <stdexcept>
 #include <iostream>
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 #include <string>
 
 using std::literals::operator""s;
@@ -79,8 +79,9 @@ char mode(const std::string &mode)
     else if (mode != "R" && mode != "A")
     {
         std::cerr << "Wrong arguments\n"
-                "Put mode as the first argument: "
-                "'R' for roman to arabic, 'A' for arabic to roman" << std::endl;
+                     "Put mode as the first argument: "
+                     "'R' for roman to arabic, 'A' for arabic to roman"
+                  << std::endl;
         return 'X';
     }
 
@@ -135,22 +136,22 @@ void TEST(bool print)
         {
             auto parsed_value = RomanArabic::Roman2Arabic(expected_roman_numeral);
             auto parsed_roman_numeral = RomanArabic::Arabic2Roman(expected_value);
-            bool this_passed = true;
+            bool current_test_passed = true;
             if (parsed_value != expected_value)
             {
-                this_passed = passed = false;
+                current_test_passed = passed = false;
                 cerr << "ERROR - values don't match: "
                      << "expected = " << quoted(to_string(expected_value)) << " "
                      << "actual = "   << quoted(to_string(parsed_value)) << endl;
             }
             if (parsed_roman_numeral != expected_roman_numeral)
             {
-                this_passed = passed = false;
+                current_test_passed = passed = false;
                 cerr << "ERROR - roman numerals don't match: "
                      << "expected = " << quoted(expected_roman_numeral) << " "
                      << "actual = "   << quoted(parsed_roman_numeral) << endl;
             }
-            if (print && this_passed)
+            if (print && current_test_passed)
             {
                 cerr << "OK - " << setw(6) << quoted(to_string(parsed_value)) << " = " << quoted(parsed_roman_numeral) << endl;
             }
@@ -175,7 +176,7 @@ void TEST(bool print)
 void TEST_WRONG(bool print)
 {
     using namespace std;
-    
+
     string line;
     bool rom2arab = false, passed = true;
     while (getline(cin, line))
@@ -192,13 +193,13 @@ void TEST_WRONG(bool print)
             if (rom2arab)
             {
                 auto parsed_value = RomanArabic::Roman2Arabic(line);
-                cerr << "ERROR - value somehow parsed: " 
+                cerr << "ERROR - value somehow parsed: "
                      << setw(18) << quoted(line) << " = " << quoted(to_string(parsed_value)) << endl;
             }
             else
             {
                 auto parsed_roman_numeral = RomanArabic::Arabic2Roman(parse_int(line));
-                cerr << "ERROR - value somehow parsed: " 
+                cerr << "ERROR - value somehow parsed: "
                      << setw(10) << quoted(line) << " = " << quoted(parsed_roman_numeral) << endl;
             }
         }

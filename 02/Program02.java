@@ -1,3 +1,4 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Program02 {
@@ -5,12 +6,11 @@ public class Program02 {
     public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("Too few arguments");
-            return;
+            System.exit(1);
         }
 
         char mode;
-        if ((mode = mode(args[0])) == 'X')
-        {
+        if ((mode = mode(args[0])) == 'X') {
             return;
         }
 
@@ -40,15 +40,15 @@ public class Program02 {
     }
 
     static char mode(String mode) {
-        System.err.println(mode);
         if (mode.equals("TEST") || mode.equals("TEST_PRINTALL")) {
             TEST(mode.equals("TEST_PRINTALL"));
             return 'X';
         } else if (mode.equals("TEST_WRONG") || mode.equals("TEST_WRONG_PRINTALL")) {
             TEST_WRONG(mode.equals("TEST_WRONG_PRINTALL"));
             return 'X';
-        } else if (mode != "R" && mode != "A") {
-            System.err.println("Wrong arguments\n" + "Put mode as the first argument: "
+        } else if (!mode.equals("R") && !mode.equals("A")) {
+            System.err.println("Wrong arguments\n" 
+                    + "Put mode as the first argument: "
                     + "'R' for roman to arabic, 'A' for arabic to roman");
             return 'X';
         }
@@ -66,8 +66,9 @@ public class Program02 {
                 int parsedValue = RomanArabic.Roman2Arabic(parsedRomanNumeral);
                 if (parsedValue != i) {
                     passed = false;
-                    System.err.println("ERROR - The results don't match: " + "i = " + quoted(i) + " "
-                            + "converted to roman = " + quoted(parsedRomanNumeral) + " "
+                    System.err.println("ERROR - The results don't match: "
+                            + "i = "                        + quoted(i) + " "
+                            + "converted to roman = "       + quoted(parsedRomanNumeral) + " "
                             + "converted back to arabic = " + quoted(parsedValue));
                 }
             } catch (RomanArabicException e) {
@@ -94,24 +95,26 @@ public class Program02 {
                 expectedRomanNumeral = scanner.nextLine().substring(1);
                 int parsedValue = RomanArabic.Roman2Arabic(expectedRomanNumeral);
                 String parsedRomanNumeral = RomanArabic.Arabic2Roman(expectedValue);
-                boolean flag = true;
+                boolean currentTestPassed = true;
                 if (parsedValue != expectedValue) {
-                    flag = passed = false;
-                    System.err.println("ERROR - values don't match: " + "expected = " + quoted(expectedValue) + " "
-                            + "actual = " + quoted(parsedValue));
+                    currentTestPassed = passed = false;
+                    System.err.println("ERROR - values don't match: "
+                            + "expected = " + quoted(expectedValue) + " "
+                            + "actual = "   + quoted(parsedValue));
                 }
                 if (!parsedRomanNumeral.equals(expectedRomanNumeral)) {
-                    flag = passed = false;
-                    System.err.println("ERROR - roman numerals don't match: " + "expected = "
-                            + quoted(expectedRomanNumeral) + " " + "actual = " + quoted(parsedRomanNumeral));
+                    currentTestPassed = passed = false;
+                    System.err.println("ERROR - roman numerals don't match: "
+                            + "expected = " + quoted(expectedRomanNumeral) + " "
+                            + "actual = "   + quoted(parsedRomanNumeral));
                 }
-                if (print && flag) {
+                if (print && currentTestPassed) {
                     System.err.println("OK - " + quoted(parsedValue) + " = " + quoted(parsedRomanNumeral));
                 }
             } catch (RomanArabicException e) {
                 passed = false;
                 System.err.println("ERROR - Exception caught: " + quoted(e.getMessage()));
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException | InputMismatchException e) {
                 System.err.println("FATAL ERROR - testing aborted, wrong test input.");
                 System.err.println(e.getMessage());
                 return;
@@ -136,7 +139,7 @@ public class Program02 {
                 continue;
             }
 
-            boolean thisPassed = false;
+            boolean currentTestPassed = false;
             try {
                 if (rom2arab) {
                     int parsedValue = RomanArabic.Roman2Arabic(line);
@@ -146,17 +149,18 @@ public class Program02 {
                     System.err.println("ERROR - value somehow parsed: " + quoted(line) + " = " + quoted(parsedRomanNumeral));
                 }
             } catch (RomanArabicException e) {
-                thisPassed = true;
+                currentTestPassed = true;
                 if (print) {
                     System.err.println("OK - Exception caught: " + quoted(e.getMessage()));
                 }
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException | InputMismatchException e) {
                 System.err.println("FATAL ERROR - testing aborted, wrong test input.");
                 System.err.println(e.getMessage());
-                System.err.println(quoted(line) + " size " + line.length());
+                if (line != null)
+                    System.err.println(quoted(line) + " size " + line.length());
                 return;
             }
-            passed = passed && thisPassed;
+            passed = passed && currentTestPassed;
         }
 
         if (!passed) {

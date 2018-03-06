@@ -3,7 +3,10 @@ CXXFLAGS = -Wall --pedantic -std=c++1z
 JAVANAMES := $(wildcard *.java)
 
 test: test_java test_cpp
+test_printall: test_java_printall test_cpp_printall
 
+test_java_printall: PRINTALL = _PRINTALL
+test_java_printall: test_java
 test_java: Program02.class
 	@echo -e '\nJava:'
 	java Program02 X 1 3 4
@@ -16,25 +19,27 @@ test_java: Program02.class
 	1000 1111 1232
 
 	@echo -ne '\n'
-	java Program02 TEST_PRINTALL < tests.csv
+	java Program02 TEST$(PRINTALL) < tests.csv
 	@echo -ne '\n'
-	java Program02 TEST_WRONG_PRINTALL < tests_wrong.csv
+	java Program02 TEST_WRONG$(PRINTALL) < tests_wrong.csv
 
+test_cpp_printall: PRINTALL = _PRINTALL
+test_cpp_printall: test_cpp
 test_cpp: program
 	@echo -e '\n\nC++:'
 	./program X 1 3 4
 	@echo -ne '\n'
 	./program R M MCD MVIII MMMCCCXXXIII MMMCMXCIX MMMMDXX XXIX XXIXA IX3 MMMCMXCIX XD DX
 	@echo -ne '\n'
-	@./program A 1 2 3 4 5 6 7 8 9 10 \
+	./program A 1 2 3 4 5 6 7 8 9 10 \
 	14 44 52 92 \
 	108 146 175 199 200 354 465 532 643 712 823 994 \
-	1000 1111 1232 2>/dev/null
+	1000 1111 1232
 	
 	@echo -ne '\n'
-	./program TEST_PRINTALL < tests.csv
+	./program TEST$(PRINTALL) < tests.csv
 	@echo -ne '\n'
-	./program TEST_WRONG_PRINTALL < tests_wrong.csv
+	./program TEST_WRONG$(PRINTALL) < tests_wrong.csv
 
 debug: DEBUGFLAGS = -g -D_GLIBCXX_DEBUG
 debug: program
