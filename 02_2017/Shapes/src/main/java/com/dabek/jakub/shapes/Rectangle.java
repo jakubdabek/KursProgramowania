@@ -1,3 +1,5 @@
+package com.dabek.jakub.shapes;
+
 public class Rectangle extends Tetragon {
 
     public Rectangle(double side1, double side2) {

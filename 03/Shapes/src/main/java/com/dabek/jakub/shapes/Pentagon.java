@@ -1,10 +1,12 @@
-public class Hexagon extends Shape {
+package com.dabek.jakub.shapes;
 
-    public static double AREA_CONSTANT = 3 * Math.sqrt(3) / 2;
+public class Pentagon extends Shape {
+
+    public static double AREA_CONSTANT = Math.sqrt(25 + 10 * Math.sqrt(5)) / 4;
 
     public double sideLength;
 
-    public Hexagon(double sideLength) {
+    public Pentagon(double sideLength) {
         this.sideLength = sideLength;
         if (sideLength < 0)
             throw new IllegalArgumentException("Side length cannot be negative");
@@ -17,7 +19,7 @@ public class Hexagon extends Shape {
 
     @Override
     public double perimeter() {
-        return 6 * sideLength;
+        return 5 * sideLength;
     }
 
 }

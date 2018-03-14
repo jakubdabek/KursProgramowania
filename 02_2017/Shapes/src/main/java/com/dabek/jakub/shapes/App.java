@@ -1,7 +1,9 @@
+package com.dabek.jakub.shapes;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Test {
+public class App {
 
     public static void main(String[] args) {
         // t - tetragon
@@ -40,7 +42,7 @@ public class Test {
                     break;
                 default:
                     System.err.println("'" + c + "'" + " doesn't denote any shape");
-                    return;
+                    System.exit(1);
                 }
             }
         } catch (NumberFormatException e) {
@@ -49,7 +51,7 @@ public class Test {
 
         for (Shape shape : shapes) {
             System.out.println(
-                shape.getClass().getName()
+                shape.getClass().getSimpleName()
                 + " with area " + shape.surfaceArea()
                 + " and perimeter " + shape.perimeter());
         }

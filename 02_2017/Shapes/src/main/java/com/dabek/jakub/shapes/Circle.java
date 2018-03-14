@@ -1,3 +1,5 @@
+package com.dabek.jakub.shapes;
+
 public class Circle extends Shape {
 
     public double radius;

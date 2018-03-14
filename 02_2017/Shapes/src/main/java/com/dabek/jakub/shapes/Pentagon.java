@@ -1,3 +1,5 @@
+package com.dabek.jakub.shapes;
+
 public class Pentagon extends Shape {
 
     public static double AREA_CONSTANT = Math.sqrt(25 + 10 * Math.sqrt(5)) / 4;

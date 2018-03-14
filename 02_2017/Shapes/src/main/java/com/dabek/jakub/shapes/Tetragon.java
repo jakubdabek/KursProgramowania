@@ -1,3 +1,5 @@
+package com.dabek.jakub.shapes;
+
 public abstract class Tetragon extends Shape {
 
     public double[] sideLengths;

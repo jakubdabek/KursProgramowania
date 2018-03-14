@@ -1,3 +1,5 @@
+package com.dabek.jakub.shapes;
+
 public class Rhombus extends Tetragon {
 
     public Rhombus(double sideLength, double angle) {

@@ -1,3 +1,5 @@
+package com.dabek.jakub.shapes;
+
 public class Square extends Tetragon {
 
     public Square(double sideLength) {
