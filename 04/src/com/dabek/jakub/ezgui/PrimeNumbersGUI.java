@@ -7,6 +7,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Label;
 import java.awt.Button;
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.MenuBar;
 import java.awt.Toolkit;
@@ -54,9 +55,8 @@ public class PrimeNumbersGUI extends JFrame {
     JTextField argumentCountTextField;
     JButton button;
 
-    PrimeNumbersGUI(String title, Font font) {
+    PrimeNumbersGUI(String title, Font font, Color backgroundColor) {
         super(title);
-        setFont(font);
         add(new Label("Enter range and number of test cases"), BorderLayout.NORTH);
         JPanel panel = new JPanel();
         //panel.setPreferredSize(new Dimension(350, 100));
@@ -87,6 +87,7 @@ public class PrimeNumbersGUI extends JFrame {
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //setPreferredSize(new Dimension(640, 480));
         App.changeFont(this, font);
+        App.changeBackgroundColor(this, backgroundColor);
         pack();
         setResizable(false);
         setLocationRelativeTo(null);
@@ -99,7 +100,7 @@ public class PrimeNumbersGUI extends JFrame {
             try {
                 int range = Integer.parseInt(rangeTextField.getText());
                 int argc = Integer.parseInt(argumentCountTextField.getText());
-                Moj2Dialog1 dialog = new Moj2Dialog1(PrimeNumbersGUI.this, argc);
+                Moj2Dialog1 dialog = new Moj2Dialog1(PrimeNumbersGUI.this, argc, getFont(), getBackground());
                 dialog.setVisible(true);
                 List<Integer> arguments = dialog.getResult();
                 if (arguments != null) {
@@ -117,9 +118,9 @@ public class PrimeNumbersGUI extends JFrame {
                         StringBuilder sb = new StringBuilder();
                         for (int i = 0; i < arguments.size(); i++) {
                             Integer prime = resultPrimes.get(i);
-                            sb.append(arguments.get(i));
                             if (prime != null) {
                                 int index = arguments.get(i);
+                                sb.append(index);
                                 switch (index % 10) {
                                 case 1:
                                     if (index % 100 / 10 != 1) {
@@ -178,7 +179,7 @@ public class PrimeNumbersGUI extends JFrame {
         JTextField argumentTextField;
         int argumentCount;
 
-        Moj2Dialog1(JFrame window, int a) {
+        Moj2Dialog1(JFrame window, int a, Font font, Color backgroundColor) {
             super(window, "Enter " + a + " arguments", true);
             argumentCount = a;
             argumentTextField = new JTextField(15 + argumentCount * 4);
@@ -186,7 +187,8 @@ public class PrimeNumbersGUI extends JFrame {
             argumentTextField.setInputVerifier(verifier);
             argumentTextField.addActionListener(verifier);
             add(argumentTextField);
-            App.changeFont(this, window.getFont());
+            App.changeFont(this, font);
+            App.changeBackgroundColor(this, backgroundColor);
             pack();
             setLocationRelativeTo(null);
         }

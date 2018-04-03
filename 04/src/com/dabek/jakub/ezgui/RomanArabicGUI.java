@@ -1,5 +1,6 @@
 package com.dabek.jakub.ezgui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import javax.swing.BoxLayout;
@@ -28,7 +30,7 @@ public class RomanArabicGUI extends JFrame {
     JTextArea output;
     JRadioButton romanToArabicCheckBox, arabicToRomanCheckBox;
 
-    RomanArabicGUI(String title, Font font) {
+    RomanArabicGUI(String title, Font font, Color backgroundColor) {
         super(title);
 
         JPanel panel = new JPanel();
@@ -67,6 +69,7 @@ public class RomanArabicGUI extends JFrame {
         add(panel);
 
         App.changeFont(this, font);
+        App.changeBackgroundColor(this, backgroundColor);
 
         pack();
         setLocationRelativeTo(null);
@@ -79,6 +82,7 @@ public class RomanArabicGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String mode = romanToArabicCheckBox.isSelected() ? "R" : "A";
             Process process = null;
+            InputStream stream = null;
             Scanner s = null;
             try {
                 //System.err.println("Working Directory = " + System.getProperty("user.dir"));
@@ -87,16 +91,18 @@ public class RomanArabicGUI extends JFrame {
                 System.err.println(file.getAbsolutePath());
                 System.err.println(currentDir.getAbsolutePath());
                 process = Runtime.getRuntime().exec("./program.exe " + mode + " " + input.getText(), null, file);
-                s = new java.util.Scanner(process.getInputStream()).useDelimiter("\\A");
+                stream = process.getInputStream();
+                s = new Scanner(stream).useDelimiter("\\A");
                 output.setText(s.hasNext() ? s.next() : "");
-                s.close();
-                s = new java.util.Scanner(process.getErrorStream()).useDelimiter("\\A");
+                stream.close();
+                stream = process.getErrorStream();
+                s = new Scanner(stream).useDelimiter("\\A");
                 output.append(s.hasNext() ? s.next() : "");
                 process.waitFor();
             } catch (IOException | InterruptedException ex) {
                 output.setText(ex.getMessage());
             } finally {
-                if(s != null)
+                if(stream != null)
                     s.close();
             }
         }

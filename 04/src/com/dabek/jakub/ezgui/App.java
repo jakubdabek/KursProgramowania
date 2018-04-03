@@ -1,6 +1,7 @@
 package com.dabek.jakub.ezgui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -11,6 +12,7 @@ import java.awt.MenuBar;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -32,6 +34,15 @@ public class App extends JFrame {
         if (component instanceof Container) {
             for (Component child : ((Container) component).getComponents()) {
                 changeFont(child, f);
+            }
+        }
+    }
+    public static void changeBackgroundColor(Component component, Color color) {
+        //Font f = component.getFont();
+        component.setBackground(color);//new Font(f.getName(),f.getStyle(),f.getSize() + fontSize));
+        if (component instanceof Container) {
+            for (Component child : ((Container) component).getComponents()) {
+                changeBackgroundColor(child, color);
             }
         }
     }
@@ -61,7 +72,13 @@ public class App extends JFrame {
                 // repaint();
             }
         });
+        JMenuItem changeColorMenuItem = new JMenuItem("Change color");
+        changeColorMenuItem.addActionListener(e -> {
+            Color newColor = JColorChooser.showDialog(App.this, "Choose background color", App.this.getBackground());
+            changeBackgroundColor(App.this, newColor);
+        });
         viewMenu.add(changeFontMenuItem);
+        viewMenu.add(changeColorMenuItem);
         menuBar.add(viewMenu);
         setJMenuBar(menuBar);
         JPanel panel = new JPanel();
@@ -71,13 +88,13 @@ public class App extends JFrame {
         add(panel, BorderLayout.CENTER);
         primeNumbersButton = new JButton("Prime numbers");
         primeNumbersButton.addActionListener(e -> {
-            PrimeNumbersGUI gui = new PrimeNumbersGUI(e.getActionCommand(), mainFont);
+            PrimeNumbersGUI gui = new PrimeNumbersGUI(e.getActionCommand(), mainFont, getBackground());
             gui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             gui.setVisible(true);
         });
         romanArabicButton = new JButton("Roman arabic conversion");
         romanArabicButton.addActionListener(e -> {
-            RomanArabicGUI gui = new RomanArabicGUI(e.getActionCommand(), mainFont);
+            RomanArabicGUI gui = new RomanArabicGUI(e.getActionCommand(), mainFont, getBackground());
             gui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             gui.setVisible(true);
         });

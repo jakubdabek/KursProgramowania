@@ -20,7 +20,7 @@ cpp:
 	cd src/RomanArabic && make program.exe
 
 clean:
-	cd Shapes && mvn clean
-	#rm -rf Shapes/target
+	rm -rf target
+	cd src/RomanArabic && make clean
 
 PHONY: test all java clean
