@@ -205,7 +205,7 @@ public class PrimeNumbersGUI extends JFrame {
                 JTextField textField = (JTextField) input;
                 try {
                     result = new ArrayList<>();
-                    String[] arguments = textField.getText().split("\\s");
+                    String[] arguments = textField.getText().split("\\s+");
                     System.err.println(Arrays.toString(arguments));
                     if (arguments.length < argumentCount)
                         return false;
