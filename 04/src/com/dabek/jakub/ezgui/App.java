@@ -107,7 +107,7 @@ public class App extends JFrame {
 
     private static void createAndShowGUI() {
         //Create and set up the window.
-        final App frame = new App("App xd");
+        final App frame = new App("App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Display the window.

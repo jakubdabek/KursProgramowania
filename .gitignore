@@ -3,6 +3,8 @@
 *.o
 *.out
 *.class
+*.exe
+out/
 
 # debug and analysis output
 *.gch
@@ -12,3 +14,16 @@
 Wyklady/
 playground/
 .vscode/
+
+# idea
+**/.idea/**/workspace.xml
+**/.idea/**/tasks.xml
+**/.idea/**/dictionaries
+**/.idea/**/shelf
+**/.idea/**/gradle.xml
+**/.idea/**/libraries
+**/.idea/**/dataSources/
+**/.idea/**/dataSources.ids
+**/.idea/**/sqlDataSources.xml
+**/.idea/**/dynamic.xml
+**/.idea/**/uiDesigner.xml
