@@ -27,3 +27,10 @@ playground/
 **/.idea/**/sqlDataSources.xml
 **/.idea/**/dynamic.xml
 **/.idea/**/uiDesigner.xml
+
+# javadoc
+05/*
+!05/.idea
+!05/src
+!05/05.iml
+!05/lista05W.pdf

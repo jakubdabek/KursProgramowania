@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.dabek.jakub.vectorpaint.controller.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.Blend?>
@@ -7,167 +8,175 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.*?>
 <?import java.lang.*?>
 
 
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.121"
-            fx:controller="com.dabek.jakub.vectorpaint.controller.Controller"
-            prefWidth="800" prefHeight="600">
-    <left>
-        <ToolBar fx:id="toolbar" orientation="VERTICAL">
-            <Button onAction="#moveButton_onAction"
-                    prefWidth="45" prefHeight="45">
-                <graphic>
-                    <Polygon id="moveIcon" fx:id="moveIcon" scaleX="2" scaleY="2">
-                        <points>
-                            <Double fx:value="0.0"/>
-                            <Double fx:value="7.0"/>
-                            <Double fx:value="2.5"/>
-                            <Double fx:value="4.5"/>
-                            <Double fx:value="2.5"/>
-                            <Double fx:value="6.0"/>
-                            <Double fx:value="6.0"/>
-                            <Double fx:value="6.0"/>
-                            <Double fx:value="6.0"/>
-                            <Double fx:value="2.5"/>
-                            <Double fx:value="4.5"/>
-                            <Double fx:value="2.5"/>
-                            <Double fx:value="7.0"/>
-                            <Double fx:value="0.0"/>
-                            <Double fx:value="9.5"/>
-                            <Double fx:value="2.5"/>
-                            <Double fx:value="7.5"/>
-                            <Double fx:value="2.5"/>
-                            <Double fx:value="8.0"/>
-                            <Double fx:value="6.0"/>
-                            <Double fx:value="11.5"/>
-                            <Double fx:value="6.0"/>
-                            <Double fx:value="11.5"/>
-                            <Double fx:value="4.5"/>
-                            <Double fx:value="14.0"/>
-                            <Double fx:value="7.0"/>
-                            <Double fx:value="11.5"/>
-                            <Double fx:value="9.5"/>
-                            <Double fx:value="11.5"/>
-                            <Double fx:value="8.0"/>
-                            <Double fx:value="8.0"/>
-                            <Double fx:value="8.0"/>
-                            <Double fx:value="8.0"/>
-                            <Double fx:value="11.5"/>
-                            <Double fx:value="9.5"/>
-                            <Double fx:value="11.5"/>
-                            <Double fx:value="7.0"/>
-                            <Double fx:value="14.0"/>
-                            <Double fx:value="4.5"/>
-                            <Double fx:value="11.5"/>
-                            <Double fx:value="6.0"/>
-                            <Double fx:value="11.5"/>
-                            <Double fx:value="6.0"/>
-                            <Double fx:value="8.0"/>
-                            <Double fx:value="2.5"/>
-                            <Double fx:value="8.0"/>
-                            <Double fx:value="2.5"/>
-                            <Double fx:value="9.5"/>
-                        </points>
-                    </Polygon>
-                </graphic>
-            </Button>
-            <Button onAction="#paintButton_onAction" fx:id="paintButton"
-                    prefWidth="45" prefHeight="45">
-                <graphic>
-                    <Group>
-                        <ImageView fx:id="paintBucketImageView"
-                                   fitWidth="25" fitHeight="25">
-                            <Image url="@../res/paint-bucket-512.png"/>
-                        </ImageView>
-                        <ImageView fx:id="paintImageView"
-                                   fitHeight="${paintBucketImageView.fitHeight}"
-                                   fitWidth="${paintBucketImageView.fitWidth}"
-                                   blendMode="SRC_ATOP">
-                            <Image url="@../res/paint-512.png"/>
-                            <effect>
-                                <Blend mode="SRC_ATOP">
-                                    <topInput>
-                                        <ColorInput width="${paintImageView.fitWidth}"
-                                                    height="${paintImageView.fitHeight}"
-                                                    paint="${colorPicker.value}"/>
-                                    </topInput>
-                                </Blend>
-                            </effect>
-                        </ImageView>
-                    </Group>
-                </graphic>
-            </Button>
-            <ColorPicker fx:id="colorPicker"
-                         style="-fx-color-label-visible: false; -fx-arrows-visible: false;"
-                         onAction="#colorPicker_onAction"
-                         prefWidth="45" prefHeight="30">
-                <value>
-                    <Color fx:value="black"/>
-                </value>
-            </ColorPicker>
-            <Separator>
-                <padding>
-                    <Insets top="5" bottom="5"/>
-                </padding>
-            </Separator>
-            <Button onAction="#rectangleButton_onAction"
-                    prefWidth="45" prefHeight="45">
-                <graphic>
-                    <Rectangle width="20" height="20" fill="${colorPicker.value}" stroke="black"/>
-                </graphic>
-            </Button>
-            <Button onAction="#circleButton_onAction"
-                    prefWidth="45" prefHeight="45">
-                <graphic>
-                    <Circle radius="10" fill="${colorPicker.value}" stroke="black"/>
-                </graphic>
-            </Button>
-            <ToggleButton onAction="#polygonButton_onAction"
-                          prefWidth="45" prefHeight="45" padding="0">
-                <graphic>
-                    <Polygon fill="${colorPicker.value}" stroke="black">
-                        <points>
-                            <Double fx:value="0.0"/>
-                            <Double fx:value="5.0"/>
-                            <Double fx:value="14.0"/>
-                            <Double fx:value="0.0"/>
-                            <Double fx:value="18.0"/>
-                            <Double fx:value="18.0"/>
-                            <Double fx:value="5.0"/>
-                            <Double fx:value="14.0"/>
-                        </points>
-                    </Polygon>
-                </graphic>
-            </ToggleButton>
-        </ToolBar>
-    </left>
-    <bottom>
-        <HBox fx:id="statusBar" alignment="CENTER_RIGHT">
-            <Label fx:id="infoLabel" text="${controller.basicInfo}" alignment="CENTER_RIGHT"/>
-        </HBox>
-    </bottom>
-    <center>
-        <Pane fx:id="drawingArea" id="drawingArea"
-              prefWidth="600" prefHeight="800"
-              onMouseClicked="#drawingArea_onMouseClicked"
-              onMouseMoved="#updateBasicInfo" onMouseExited="#updateBasicInfo"
-              onMouseDragged="#drawingArea_onMouseDragged" onMouseDragExited="#updateBasicInfo">
-            <clip>
-                <Rectangle width="${drawingArea.width}" height="${drawingArea.height}"/>
-            </clip>
-            <Circle fx:id="circleXD"
-                    centerX="0" centerY="0"
-                    radius="150" fill="orangered"
-                    onMouseClicked="#circleXD_onMouseClicked"/>
-            <Circle centerX="${drawingArea.width}" centerY="${drawingArea.height}"
-                    radius="150" fill="mediumpurple"
-                    blendMode="MULTIPLY"/>
-        </Pane>
-    </center>
-</BorderPane>
+<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="com.dabek.jakub.vectorpaint.controller.Controller">
+    <MenuBar>
+        <Menu text="File">
+            <MenuItem text="New" onAction="#menu_new_onAction"/>
+            <MenuItem text="Open" onAction="#menu_open_onAction"/>
+            <MenuItem text="Save" onAction="#menu_save_onAction"/>
+            <SeparatorMenuItem/>
+            <MenuItem text="Exit" onAction="#menu_exit_onAction"/>
+        </Menu>
+        <Menu text="Help">
+            <MenuItem text="About" onAction="#menu_about_onAction"/>
+        </Menu>
+    </MenuBar>
+    <BorderPane prefWidth="800" prefHeight="600" fx:id="borderPane">
+        <left>
+            <ToolBar orientation="VERTICAL">
+                <userData>
+                    <ToggleGroup fx:id="toolbarToggleGroup"/>
+                </userData>
+                <ToggleButton prefWidth="45" prefHeight="45" toggleGroup="$toolbarToggleGroup">
+                    <userData><com.dabek.jakub.vectorpaint.controller.Controller.PaintMode fx:value="MOVE"/></userData>
+                    <graphic>
+                        <Polygon id="moveIcon" scaleX="2" scaleY="2">
+                            <points>
+                                <Double fx:value="0.0"/>
+                                <Double fx:value="7.0"/>
+                                <Double fx:value="2.5"/>
+                                <Double fx:value="4.5"/>
+                                <Double fx:value="2.5"/>
+                                <Double fx:value="6.0"/>
+                                <Double fx:value="6.0"/>
+                                <Double fx:value="6.0"/>
+                                <Double fx:value="6.0"/>
+                                <Double fx:value="2.5"/>
+                                <Double fx:value="4.5"/>
+                                <Double fx:value="2.5"/>
+                                <Double fx:value="7.0"/>
+                                <Double fx:value="0.0"/>
+                                <Double fx:value="9.5"/>
+                                <Double fx:value="2.5"/>
+                                <Double fx:value="7.5"/>
+                                <Double fx:value="2.5"/>
+                                <Double fx:value="8.0"/>
+                                <Double fx:value="6.0"/>
+                                <Double fx:value="11.5"/>
+                                <Double fx:value="6.0"/>
+                                <Double fx:value="11.5"/>
+                                <Double fx:value="4.5"/>
+                                <Double fx:value="14.0"/>
+                                <Double fx:value="7.0"/>
+                                <Double fx:value="11.5"/>
+                                <Double fx:value="9.5"/>
+                                <Double fx:value="11.5"/>
+                                <Double fx:value="8.0"/>
+                                <Double fx:value="8.0"/>
+                                <Double fx:value="8.0"/>
+                                <Double fx:value="8.0"/>
+                                <Double fx:value="11.5"/>
+                                <Double fx:value="9.5"/>
+                                <Double fx:value="11.5"/>
+                                <Double fx:value="7.0"/>
+                                <Double fx:value="14.0"/>
+                                <Double fx:value="4.5"/>
+                                <Double fx:value="11.5"/>
+                                <Double fx:value="6.0"/>
+                                <Double fx:value="11.5"/>
+                                <Double fx:value="6.0"/>
+                                <Double fx:value="8.0"/>
+                                <Double fx:value="2.5"/>
+                                <Double fx:value="8.0"/>
+                                <Double fx:value="2.5"/>
+                                <Double fx:value="9.5"/>
+                            </points>
+                        </Polygon>
+                    </graphic>
+                </ToggleButton>
+                <ToggleButton prefWidth="45" prefHeight="45" toggleGroup="$toolbarToggleGroup">
+                    <userData><com.dabek.jakub.vectorpaint.controller.Controller.PaintMode fx:value="FILL"/></userData>
+                    <graphic>
+                        <Group>
+                            <ImageView fx:id="paintBucketImageView"
+                                       fitWidth="25" fitHeight="25">
+                                <Image url="@../res/paint-bucket-512.png"/>
+                            </ImageView>
+                            <ImageView fx:id="paintImageView"
+                                       fitHeight="${paintBucketImageView.fitHeight}"
+                                       fitWidth="${paintBucketImageView.fitWidth}"
+                                       blendMode="SRC_ATOP">
+                                <Image url="@../res/paint-512.png"/>
+                                <effect>
+                                    <Blend mode="SRC_ATOP">
+                                        <topInput>
+                                            <ColorInput width="${paintImageView.fitWidth}"
+                                                        height="${paintImageView.fitHeight}"
+                                                        paint="${colorPicker.value}"/>
+                                        </topInput>
+                                    </Blend>
+                                </effect>
+                            </ImageView>
+                        </Group>
+                    </graphic>
+                </ToggleButton>
+                <ColorPicker fx:id="colorPicker"
+                             style="-fx-color-label-visible: false; -fx-arrows-visible: false;"
+                             prefWidth="45" prefHeight="30">
+                    <value>
+                        <Color fx:value="red"/>
+                    </value>
+                </ColorPicker>
+                <Separator>
+                    <padding>
+                        <Insets top="5" bottom="5"/>
+                    </padding>
+                </Separator>
+                <ToggleButton prefWidth="45" prefHeight="45" toggleGroup="$toolbarToggleGroup" selected="true">
+                    <userData><com.dabek.jakub.vectorpaint.controller.Controller.PaintMode fx:value="RECTANGLE"/></userData>
+                    <graphic>
+                        <Rectangle width="20" height="20" fill="${colorPicker.value}" stroke="black"/>
+                    </graphic>
+                </ToggleButton>
+                <ToggleButton prefWidth="45" prefHeight="45" toggleGroup="$toolbarToggleGroup">
+                    <userData><com.dabek.jakub.vectorpaint.controller.Controller.PaintMode fx:value="CIRCLE"/></userData>
+                    <graphic>
+                        <Circle radius="10" fill="${colorPicker.value}" stroke="black"/>
+                    </graphic>
+                </ToggleButton>
+                <ToggleButton prefWidth="45" prefHeight="45" toggleGroup="$toolbarToggleGroup">
+                    <userData><com.dabek.jakub.vectorpaint.controller.Controller.PaintMode fx:value="POLYGON"/></userData>
+                    <graphic>
+                        <Polygon fill="${colorPicker.value}" stroke="black">
+                            <points>
+                                <Double fx:value="0.0"/>
+                                <Double fx:value="5.0"/>
+                                <Double fx:value="14.0"/>
+                                <Double fx:value="0.0"/>
+                                <Double fx:value="18.0"/>
+                                <Double fx:value="18.0"/>
+                                <Double fx:value="5.0"/>
+                                <Double fx:value="14.0"/>
+                            </points>
+                        </Polygon>
+                    </graphic>
+                </ToggleButton>
+            </ToolBar>
+        </left>
+        <bottom>
+            <HBox alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
+                <Label text="${controller.additionalInfo}" minWidth="50"/>
+                <Separator orientation="VERTICAL" style="-fx-padding: 0 4 0 4"/>
+                <Label text="${controller.basicInfo}" minWidth="50"/>
+            </HBox>
+        </bottom>
+        <center>
+            <Pane fx:id="drawingArea" id="drawingArea"
+                  prefWidth="600" prefHeight="800"
+                  onMouseClicked="#beginDraw"
+                  onMouseMoved="#updateBasicInfo" onMouseExited="#updateBasicInfo"
+                  onMouseDragged="#updateBasicInfo">
+                <clip>
+                    <Rectangle width="${drawingArea.width}" height="${drawingArea.height}"/>
+                </clip>
+            </Pane>
+        </center>
+    </BorderPane>
+</VBox>
