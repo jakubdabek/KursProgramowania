@@ -24,7 +24,7 @@
             <SeparatorMenuItem/>
             <MenuItem text="Exit" onAction="#menu_exit_onAction"/>
         </Menu>
-        <Menu text="Help">
+        <Menu text="Info">
             <MenuItem text="About" onAction="#menu_about_onAction"/>
         </Menu>
     </MenuBar>
@@ -161,10 +161,10 @@
             </ToolBar>
         </left>
         <bottom>
-            <HBox alignment="CENTER_RIGHT" VBox.vgrow="NEVER">
-                <Label text="${controller.additionalInfo}" minWidth="50"/>
+            <HBox alignment="CENTER_RIGHT">
+                <Label text="${controller.additionalInfo}" minWidth="70"/>
                 <Separator orientation="VERTICAL" style="-fx-padding: 0 4 0 4"/>
-                <Label text="${controller.basicInfo}" minWidth="50"/>
+                <Label text="${controller.basicInfo}" minWidth="60"/>
             </HBox>
         </bottom>
         <center>

@@ -237,22 +237,22 @@ public class Controller {
     /**
      * Clears the drawing field
      */
-    public void menu_new_onAction(ActionEvent actionEvent) {
+    public void menu_new_onAction() {
         drawingArea.getChildren().clear();
     }
 
     /**
      * Exits the application
      */
-    public void menu_exit_onAction(ActionEvent actionEvent) {
+    public void menu_exit_onAction() {
         Platform.exit();
     }
 
     /**
      * Displays information about the application
      */
-    public void menu_about_onAction(ActionEvent actionEvent) {
-        showAlert(Alert.AlertType.INFORMATION, "About",
+    public void menu_about_onAction() {
+        showAlert(Alert.AlertType.INFORMATION, "VectorPaint",
                 "A simple application for vector graphics\n" +
                         "Creator: Jakub Dąbek");
     }
@@ -260,7 +260,7 @@ public class Controller {
     /**
      * Opens a file dialog and loads the chosen file to the drawing area
      */
-    public void menu_open_onAction(ActionEvent actionEvent) {
+    public void menu_open_onAction() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FXML files", "*.fxml"));
         File file = fileChooser.showOpenDialog(drawingArea.getScene().getWindow());
@@ -297,7 +297,7 @@ public class Controller {
     /**
      * Opens a file dialog and saves the current state of the drawing area to a file
      */
-    public void menu_save_onAction(ActionEvent actionEvent) {
+    public void menu_save_onAction() {
         String serializedPane = serializePane(drawingArea);
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("FXML files", "*.fxml"));
@@ -336,6 +336,10 @@ public class Controller {
                 sb.append(" fill=\""); sb.append(rectangle.getFill().toString()); sb.append("\"");
                 sb.append(" x=\""); sb.append(rectangle.getX()); sb.append("\"");
                 sb.append(" y=\""); sb.append(rectangle.getY()); sb.append("\"");
+                sb.append(" translateX=\""); sb.append(rectangle.getTranslateX()); sb.append("\"");
+                sb.append(" translateY=\""); sb.append(rectangle.getTranslateY()); sb.append("\"");
+                sb.append(" scaleX=\""); sb.append(rectangle.getScaleX()); sb.append("\"");
+                sb.append(" scaleY=\""); sb.append(rectangle.getScaleY()); sb.append("\"");
                 sb.append("/>\n");
             } else if (node instanceof Circle) {
                 Circle circle = (Circle)node;
@@ -344,6 +348,10 @@ public class Controller {
                 sb.append(" fill=\""); sb.append(circle.getFill().toString()); sb.append("\"");
                 sb.append(" centerX=\""); sb.append(circle.getCenterX()); sb.append("\"");
                 sb.append(" centerY=\""); sb.append(circle.getCenterY()); sb.append("\"");
+                sb.append(" translateX=\""); sb.append(circle.getTranslateX()); sb.append("\"");
+                sb.append(" translateY=\""); sb.append(circle.getTranslateY()); sb.append("\"");
+                sb.append(" scaleX=\""); sb.append(circle.getScaleX()); sb.append("\"");
+                sb.append(" scaleY=\""); sb.append(circle.getScaleY()); sb.append("\"");
                 sb.append("/>\n");
             } else if (node instanceof Polygon) {
                 Polygon polygon = (Polygon)node;
@@ -353,6 +361,8 @@ public class Controller {
                 sb.append(" layoutY=\""); sb.append(polygon.getLayoutY()); sb.append("\"");
                 sb.append(" translateX=\""); sb.append(polygon.getTranslateX()); sb.append("\"");
                 sb.append(" translateY=\""); sb.append(polygon.getTranslateY()); sb.append("\"");
+                sb.append(" scaleX=\""); sb.append(polygon.getScaleX()); sb.append("\"");
+                sb.append(" scaleY=\""); sb.append(polygon.getScaleY()); sb.append("\"");
                 sb.append(">\n");
                 sb.append("        <points>\n");
                 for(Double point : polygon.getPoints()) {
