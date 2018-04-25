@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -129,16 +128,16 @@ public class Controller {
                 Rectangle rectangle = (Rectangle)shape;
                 sb.append("Rectangle(");
                 sb.append("position: (");
-                sb.append(Math.round(bounds.getMinX())); sb.append(", "); sb.append(Math.round(bounds.getMinY()));
+                sb.append(Math.round(bounds.getMinX())).append(", ").append(Math.round(bounds.getMinY()));
                 sb.append(") size: ");
-                sb.append(Math.round(bounds.getWidth())); sb.append("x"); sb.append(Math.round(bounds.getHeight()));
+                sb.append(Math.round(bounds.getWidth())).append("x").append(Math.round(bounds.getHeight()));
                 sb.append(")");
             } else if(shape instanceof Circle) {
                 Circle circle = (Circle)shape;
                 sb.append("Circle(");
                 long radius = Math.round(bounds.getWidth() / 2.0);
                 sb.append("center position: (");
-                sb.append(Math.round(bounds.getMinX() + radius)); sb.append(", "); sb.append(Math.round(bounds.getMinY() + radius));
+                sb.append(Math.round(bounds.getMinX() + radius)).append(", ").append(Math.round(bounds.getMinY() + radius));
                 sb.append(") radius: ");
                 sb.append(radius);
                 sb.append(")");
@@ -146,9 +145,9 @@ public class Controller {
                 Polygon polygon = (Polygon)shape;
                 sb.append("Polygon(");
                 sb.append("position: (");
-                sb.append(Math.round(bounds.getMinX())); sb.append(", "); sb.append(Math.round(bounds.getMinY()));
+                sb.append(Math.round(bounds.getMinX())).append(", ").append(Math.round(bounds.getMinY()));
                 sb.append(") size: ");
-                sb.append(Math.round(bounds.getWidth())); sb.append("x"); sb.append(Math.round(bounds.getHeight()));
+                sb.append(Math.round(bounds.getWidth())).append("x").append(Math.round(bounds.getHeight()));
                 sb.append(")");
             }
 
@@ -180,8 +179,11 @@ public class Controller {
     }
 
     private void removeOutline() {
-        if(currentOutline != null)
+        if(currentOutline != null) {
             drawingArea.getChildren().remove(currentOutline);
+            additionalInfoProperty().unbind();
+            setAdditionalInfo("");
+        }
     }
 
     /**
@@ -318,56 +320,58 @@ public class Controller {
      * @return serialized {@code pane's} state in a {@link String}
      */
     private static String serializePane(Pane pane) {
-        StringBuilder sb = new StringBuilder("<?import javafx.scene.control.*?>\n" +
+        StringBuilder sb = new StringBuilder(
+                "<?import javafx.scene.control.*?>\n" +
                 "<?import javafx.scene.layout.Pane?>\n" +
                 "<?import javafx.scene.paint.Color?>\n" +
                 "<?import javafx.scene.shape.*?>\n" +
                 "<?import java.lang.*?>\n"
         );
         sb.append("<Pane prefWidth=\"600\" prefHeight=\"800\" " +
-                "xmlns:fx=\"http://javafx.com/fxml/1\" xmlns=\"http://javafx.com/javafx/8.0.121\">\n");
+                  "xmlns:fx=\"http://javafx.com/fxml/1\" xmlns=\"http://javafx.com/javafx/8.0.121\">\n");
         for(Node node : pane.getChildren()) {
             sb.append("    ");
             if (node instanceof Rectangle) {
                 Rectangle rectangle = (Rectangle)node;
                 sb.append("<Rectangle");
-                sb.append(" width=\""); sb.append(rectangle.getWidth()); sb.append("\"");
-                sb.append(" height=\""); sb.append(rectangle.getHeight()); sb.append("\"");
-                sb.append(" fill=\""); sb.append(rectangle.getFill().toString()); sb.append("\"");
-                sb.append(" x=\""); sb.append(rectangle.getX()); sb.append("\"");
-                sb.append(" y=\""); sb.append(rectangle.getY()); sb.append("\"");
-                sb.append(" translateX=\""); sb.append(rectangle.getTranslateX()); sb.append("\"");
-                sb.append(" translateY=\""); sb.append(rectangle.getTranslateY()); sb.append("\"");
-                sb.append(" scaleX=\""); sb.append(rectangle.getScaleX()); sb.append("\"");
-                sb.append(" scaleY=\""); sb.append(rectangle.getScaleY()); sb.append("\"");
+                sb.append(" width=\"").append(rectangle.getWidth()).append("\"");
+                sb.append(" height=\"").append(rectangle.getHeight()).append("\"");
+                sb.append(" fill=\"").append(rectangle.getFill().toString()).append("\"");
+                sb.append(" x=\"").append(rectangle.getX()).append("\"");
+                sb.append(" y=\"").append(rectangle.getY()).append("\"");
+                sb.append(" translateX=\"").append(rectangle.getTranslateX()).append("\"");
+                sb.append(" translateY=\"").append(rectangle.getTranslateY()).append("\"");
+                sb.append(" scaleX=\"").append(rectangle.getScaleX()).append("\"");
+                sb.append(" scaleY=\"").append(rectangle.getScaleY()).append("\"");
                 sb.append("/>\n");
             } else if (node instanceof Circle) {
                 Circle circle = (Circle)node;
                 sb.append("<Circle");
-                sb.append(" radius=\""); sb.append(circle.getRadius()); sb.append("\"");
-                sb.append(" fill=\""); sb.append(circle.getFill().toString()); sb.append("\"");
-                sb.append(" centerX=\""); sb.append(circle.getCenterX()); sb.append("\"");
-                sb.append(" centerY=\""); sb.append(circle.getCenterY()); sb.append("\"");
-                sb.append(" translateX=\""); sb.append(circle.getTranslateX()); sb.append("\"");
-                sb.append(" translateY=\""); sb.append(circle.getTranslateY()); sb.append("\"");
-                sb.append(" scaleX=\""); sb.append(circle.getScaleX()); sb.append("\"");
-                sb.append(" scaleY=\""); sb.append(circle.getScaleY()); sb.append("\"");
+                sb.append(" radius=\"");
+                sb.append(circle.getRadius()).append("\"").append(" fill=\"");
+                sb.append(circle.getFill().toString()).append("\"");
+                sb.append(" centerX=\"").append(circle.getCenterX()).append("\"");
+                sb.append(" centerY=\"").append(circle.getCenterY()).append("\"");
+                sb.append(" translateX=\"").append(circle.getTranslateX()).append("\"");
+                sb.append(" translateY=\"").append(circle.getTranslateY()).append("\"");
+                sb.append(" scaleX=\"").append(circle.getScaleX()).append("\"");
+                sb.append(" scaleY=\"").append(circle.getScaleY()).append("\"");
                 sb.append("/>\n");
             } else if (node instanceof Polygon) {
                 Polygon polygon = (Polygon)node;
                 sb.append("<Polygon");
-                sb.append(" fill=\""); sb.append(polygon.getFill().toString()); sb.append("\"");
-                sb.append(" layoutX=\""); sb.append(polygon.getLayoutX()); sb.append("\"");
-                sb.append(" layoutY=\""); sb.append(polygon.getLayoutY()); sb.append("\"");
-                sb.append(" translateX=\""); sb.append(polygon.getTranslateX()); sb.append("\"");
-                sb.append(" translateY=\""); sb.append(polygon.getTranslateY()); sb.append("\"");
-                sb.append(" scaleX=\""); sb.append(polygon.getScaleX()); sb.append("\"");
-                sb.append(" scaleY=\""); sb.append(polygon.getScaleY()); sb.append("\"");
+                sb.append(" fill=\"").append(polygon.getFill().toString()).append("\"");
+                sb.append(" layoutX=\"").append(polygon.getLayoutX()).append("\"");
+                sb.append(" layoutY=\"").append(polygon.getLayoutY()).append("\"");
+                sb.append(" translateX=\"").append(polygon.getTranslateX()).append("\"");
+                sb.append(" translateY=\"").append(polygon.getTranslateY()).append("\"");
+                sb.append(" scaleX=\"").append(polygon.getScaleX()).append("\"");
+                sb.append(" scaleY=\"").append(polygon.getScaleY()).append("\"");
                 sb.append(">\n");
                 sb.append("        <points>\n");
                 for(Double point : polygon.getPoints()) {
                     sb.append("            ");
-                    sb.append("<Double fx:value=\""); sb.append(point); sb.append("\"/>\n");
+                    sb.append("<Double fx:value=\"").append(point).append("\"/>\n");
                 }
                 sb.append("        </points>\n");
                 sb.append("    </Polygon>\n");
