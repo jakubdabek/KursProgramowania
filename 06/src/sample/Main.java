@@ -2,123 +2,158 @@ package sample;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.scene.Scene;
-import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
  * The main class
+ * <p>
+ * Field is initialized and all threads are started in {@link Main#start(Stage)}
+ * </p>
+ *
  * @author Jakub Dąbek
  */
 public class Main extends Application {
 
-    private static final Random random = new Random();
-
-    private static synchronized Color getRandomColor() {
-        synchronized (random) {
-            return Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-        }
+    /**
+     * Mod operation always returning positive values
+     *
+     * @return {@code value} mod {@code modulus}, positive even when {@code value} is negative
+     */
+    private static int mod(int value, int modulus) {
+        return ((value % modulus) + modulus) % modulus;
     }
 
-    private static int mod(int v, int m) {
-        return ((v % m) + m) % m;
+    /**
+     * Computes the neighbours of a given cell in a 2D array treating it as a torus
+     * @param rectangles the whole field
+     * @return array containing neighbours of the cell in the given position
+     */
+    private static Rectangle[] getNeighbours(Rectangle[][] rectangles, int rowIndex, int columnIndex) {
+        final int rowCount = rectangles.length;
+        final int columnCount = rectangles[0].length;
+        final Rectangle[] neighbours = new Rectangle[4];
+
+        neighbours[0] = rectangles[mod(rowIndex - 1, rowCount)][columnIndex];
+        neighbours[1] = rectangles[rowIndex][mod(columnIndex - 1, columnCount)];
+        neighbours[2] = rectangles[mod(rowIndex + 1, rowCount)][columnIndex];
+        neighbours[3] = rectangles[rowIndex][mod(columnIndex + 1, columnCount)];
+
+        return neighbours;
     }
 
-    private static AtomicBoolean running = new AtomicBoolean(true);
     private static List<Thread> threads;
 
+    /**
+     * Parses arguments, creates the cells initiates threads and starts their execution
+     * @param primaryStage {@inheritDoc}
+     */
     @Override
-    public void start(Stage primaryStage) throws NumberFormatException {
-        GridPane gridPane = new GridPane();
+    public void start(Stage primaryStage) {
         List<String> parameters = this.getParameters().getRaw();
-        int rectangleSize = Integer.parseInt(parameters.get(0));
-        int width = Integer.parseInt(parameters.get(1));
-        int height = Integer.parseInt(parameters.get(2));
-        int delay = Integer.parseInt(parameters.get(3));
-        double chanceOfRandom = Double.parseDouble(parameters.get(4));
-        threads = new ArrayList<>(width * height);
-        Rectangle[][] rectangles = new Rectangle[width][height];
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                final Rectangle rect = new Rectangle(rectangleSize, rectangleSize);
-                rect.setFill(getRandomColor());
-                rectangles[i][j] = rect;
-                gridPane.add(rect, i, j);
+        if (parameters.size() < 5) {
+            System.err.println("Too few arguments");
+            System.err.println("The first 5 arguments should be:");
+            System.err.println("\tinitial size of rectangles (both width and height)");
+            System.err.println("\tnumber of columns");
+            System.err.println("\tnumber of rows");
+            System.err.println("\taverage delay of operations");
+            System.err.println("\tthe probability of a cell changing to a random color");
+            Platform.exit();
+            return;
+        }
+        final int rectangleSize;
+        final int columnCount;
+        final int rowCount;
+        final long defaultDelay;
+        final double randomColorChance;
+        try {
+            rectangleSize = Integer.parseInt(parameters.get(0));
+            columnCount = Integer.parseInt(parameters.get(1));
+            rowCount = Integer.parseInt(parameters.get(2));
+            defaultDelay = Long.parseLong(parameters.get(3));
+            randomColorChance = Double.parseDouble(parameters.get(4));
+            if (randomColorChance < 0.0 || randomColorChance > 1.0) {
+                throw new NumberFormatException("Probability should be in range [0.0, 1.0]");
+            }
+        } catch (NumberFormatException ex) {
+            System.err.println("Not all arguments are correct");
+            System.err.println("The first 4 arguments should be integers, the 5th should be a floating-point number");
+            System.err.println(ex.getLocalizedMessage());
+
+            Platform.exit();
+            return;
+        }
+
+        Pane root = new Pane();
+        threads = new ArrayList<>(columnCount * rowCount);
+        Rectangle[][] rectangles = new Rectangle[rowCount][columnCount];
+
+        for (int i = 0; i < columnCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+                final Rectangle rect = new Rectangle(rectangleSize, rectangleSize, CellRunner.getRandomColor());
+                rectangles[j][i] = rect;
+                rect.layoutXProperty().bind(
+                        root.widthProperty()
+                                .divide(columnCount)
+                                .multiply(i)
+                                .subtract(Bindings.createDoubleBinding(() -> rect.getLayoutBounds().getMinX(), rect.layoutBoundsProperty()))
+                );
+                rect.layoutYProperty().bind(
+                        root.heightProperty()
+                                .divide(rowCount)
+                                .multiply(j)
+                                .subtract(Bindings.createDoubleBinding(() -> rect.getLayoutBounds().getMinY(), rect.layoutBoundsProperty()))
+                );
+                root.getChildren().add(rect);
+                rect.widthProperty().bind(root.widthProperty().divide(columnCount));
+                rect.heightProperty().bind(root.heightProperty().divide(rowCount));
             }
         }
 
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                final Rectangle[] neighbours = new Rectangle[4];
-                neighbours[0] = rectangles[mod(i - 1, width)][j];
-                neighbours[1] = rectangles[i][mod(j - 1, height)];
-                neighbours[2] = rectangles[mod(i + 1, width)][j];
-                neighbours[3] = rectangles[i][mod(j + 1, height)];
-                final Rectangle thisRect = rectangles[i][j];
-                final int tmpI = i, tmpJ = j;
-                threads.add(new Thread(() -> {
-                    final int threadId = tmpI * height + tmpJ;
-                    System.out.format("Thread %d started\n", threadId);
-
-                    final Random localRandom;
-                    synchronized (random) {
-                        localRandom = new Random(random.nextLong());
-                    }
-                    while (running.get()) {
-                        if (localRandom.nextDouble() < chanceOfRandom) {
-                            Platform.runLater(() -> thisRect.setFill(getRandomColor()));
-                        } else {
-                            int red = 0, green = 0, blue = 0;
-                            for (Rectangle r : neighbours) {
-                                Color c = (Color) r.getFill();
-                                red += c.getRed() * 255;
-                                green += c.getGreen() * 255;
-                                blue += c.getBlue() * 255;
-                                //System.err.format("%d %d %d\n", red, green, blue);
-                            }
-                            red /= 4;
-                            green /= 4;
-                            blue /= 4;
-                            Color newColor = Color.rgb(red, green, blue);
-                            //System.err.println(newColor);
-                            Platform.runLater(() -> thisRect.setFill(newColor));
-                        }
-                        try {
-                            Thread.sleep((long) (localRandom.nextInt(delay) + delay / 2));
-                        } catch (InterruptedException ex) {
-                            System.err.println("Thread interrupted. Well, it happens ¯\\_(ツ)_/¯");
-                        }
-                    }
-
-                    System.out.format("Thread %d finished\n", threadId);
-                }));
+        for (int i = 0; i < columnCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+                threads.add(new Thread(new CellRunner(
+                        i * rowCount + j,
+                        rectangles[j][i],
+                        getNeighbours(rectangles, j, i),
+                        defaultDelay,
+                        randomColorChance
+                )));
             }
         }
 
         primaryStage.setTitle("Color Field");
-        primaryStage.setScene(new Scene(gridPane));
+        primaryStage.setScene(new Scene(root));
+        primaryStage.sizeToScene();
         primaryStage.show();
 
+        CellRunner.setRunning(true);
         for (Thread thread : threads) {
             thread.start();
         }
     }
 
     @Override
-    public void stop() throws Exception {
-        running.set(false);
-        for (Thread thread : threads) {
-            thread.join();
+    public void stop() {
+        if(threads != null) {
+            CellRunner.setRunning(false);
+            for (Thread thread : threads) {
+                try {
+                    thread.join();
+                } catch (InterruptedException ex) {
+                    System.err.println(ex.getLocalizedMessage());
+                }
+            }
+            System.err.println("All threads finished");
         }
-        super.stop();
     }
 
     public static void main(String[] args) {
