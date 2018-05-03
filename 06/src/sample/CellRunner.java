@@ -4,13 +4,26 @@ import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
+/**
+ * Class responsible for managing the color of one cell
+ *
+ * @see CellRunner#run()
+ */
 public class CellRunner implements Runnable {
 
     private static final AtomicBoolean running = new AtomicBoolean(false);
 
+    /**
+     * Sets the running state of all created cells.
+     * <p>
+     * Has to be set to true before starting any threads managing the cells.
+     */
     public static void setRunning(boolean newValue) {
         running.set(newValue);
     }
@@ -33,7 +46,7 @@ public class CellRunner implements Runnable {
     }
 
     /**
-     * Creates a random color
+     * Creates a random color.
      *
      * @return a random color
      */
@@ -45,6 +58,32 @@ public class CellRunner implements Runnable {
         );
     }
 
+    /**
+     * Takes the average of the given colors by taking the square average of their components.
+     *
+     * @param colors an iterable of {@link Color Colors}
+     * @return the average of the given colors
+     */
+    private static Color getAverageColor(Iterable<Color> colors) {
+        double red = 0.0, green = 0.0, blue = 0.0;
+        int count = 0;
+        for (Color c : colors) {
+            red += c.getRed() * c.getRed();
+            green += c.getGreen() * c.getGreen();
+            blue += c.getBlue() * c.getBlue();
+            count++;
+        }
+        red /= count;
+        green /= count;
+        blue /= count;
+
+        return Color.color(Math.sqrt(red), Math.sqrt(green), Math.sqrt(blue));
+    }
+
+    /**
+     * Sets a random color to the cell or an average of its neighbours' colors
+     * with a random delay within [0.5{@link CellRunner#defaultDelay d}, 1.5{@link CellRunner#defaultDelay d}]
+     */
     @Override
     public void run() {
         synchronized (System.err) {
@@ -54,21 +93,17 @@ public class CellRunner implements Runnable {
             if (ThreadLocalRandom.current().nextDouble() < randomColorChance) {
                 Platform.runLater(() -> rectangle.setFill(getRandomColor()));
             } else {
-                double red = 0, green = 0, blue = 0;
-                for (Rectangle r : neighbours) {
-                    Color c = (Color) r.getFill();
-                    red += c.getRed();
-                    green += c.getGreen();
-                    blue += c.getBlue();
-                }
-                red /= 4;
-                green /= 4;
-                blue /= 4;
-                Color newColor = Color.color(red, green, blue);
-                Platform.runLater(() -> rectangle.setFill(newColor));
+                Platform.runLater(() -> {
+                    List<Color> colors =
+                            Arrays.stream(neighbours)
+                                    .map(r -> (Color) r.getFill())
+                                    .collect(Collectors.toList());
+
+                    rectangle.setFill(getAverageColor(colors));
+                });
             }
             try {
-                Thread.sleep(ThreadLocalRandom.current().nextLong(defaultDelay) + defaultDelay / 2);
+                Thread.sleep(ThreadLocalRandom.current().nextLong(defaultDelay + 1) + defaultDelay / 2);
             } catch (InterruptedException ex) {
                 synchronized (System.err) {
                     System.err.format("Thread %d interrupted. Well, it happens ¯\\_(ツ)_/¯", id);
@@ -76,10 +111,8 @@ public class CellRunner implements Runnable {
                 }
             }
         }
-
         synchronized (System.err) {
             System.err.format("Thread %d finished\n", id);
         }
-
     }
 }

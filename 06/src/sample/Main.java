@@ -13,7 +13,7 @@ import java.util.List;
 
 
 /**
- * The main class
+ * The main class.
  * <p>
  * Field is initialized and all threads are started in {@link Main#start(Stage)}
  * </p>
@@ -23,16 +23,17 @@ import java.util.List;
 public class Main extends Application {
 
     /**
-     * Mod operation always returning positive values
+     * Mod operation always returning positive values, used to get around default Java behaviour.
      *
-     * @return {@code value} mod {@code modulus}, positive even when {@code value} is negative
+     * @return {@code value (mod modulus)}, positive even when {@code value} is negative
      */
     private static int mod(int value, int modulus) {
         return ((value % modulus) + modulus) % modulus;
     }
 
     /**
-     * Computes the neighbours of a given cell in a 2D array treating it as a torus
+     * Computes the neighbours of a given cell in a 2D array treating it as a torus.
+     *
      * @param rectangles the whole field
      * @return array containing neighbours of the cell in the given position
      */
@@ -52,8 +53,7 @@ public class Main extends Application {
     private static List<Thread> threads;
 
     /**
-     * Parses arguments, creates the cells initiates threads and starts their execution
-     * @param primaryStage {@inheritDoc}
+     * Parses arguments, creates the cells, initiates threads and starts their execution.
      */
     @Override
     public void start(Stage primaryStage) {
@@ -61,21 +61,21 @@ public class Main extends Application {
         if (parameters.size() < 5) {
             System.err.println("Too few arguments");
             System.err.println("The first 5 arguments should be:");
-            System.err.println("\tinitial size of rectangles (both width and height)");
-            System.err.println("\tnumber of columns");
-            System.err.println("\tnumber of rows");
-            System.err.println("\taverage delay of operations");
-            System.err.println("\tthe probability of a cell changing to a random color");
+            System.err.println("\t1. initial size of rectangles (both width and height simultaneously)");
+            System.err.println("\t2. number of columns");
+            System.err.println("\t3. number of rows");
+            System.err.println("\t4. average delay of operations");
+            System.err.println("\t5. the probability of a cell changing to a random color");
             Platform.exit();
             return;
         }
-        final int rectangleSize;
+        final double rectangleSize;
         final int columnCount;
         final int rowCount;
         final long defaultDelay;
         final double randomColorChance;
         try {
-            rectangleSize = Integer.parseInt(parameters.get(0));
+            rectangleSize = Double.parseDouble(parameters.get(0));
             columnCount = Integer.parseInt(parameters.get(1));
             rowCount = Integer.parseInt(parameters.get(2));
             defaultDelay = Long.parseLong(parameters.get(3));
@@ -85,21 +85,24 @@ public class Main extends Application {
             }
         } catch (NumberFormatException ex) {
             System.err.println("Not all arguments are correct");
-            System.err.println("The first 4 arguments should be integers, the 5th should be a floating-point number");
+            System.err.println("Arguments should have the following types: double, int, int, long, double");
             System.err.println(ex.getLocalizedMessage());
 
             Platform.exit();
             return;
         }
 
-        Pane root = new Pane();
+        final Pane root = new Pane();
         threads = new ArrayList<>(columnCount * rowCount);
-        Rectangle[][] rectangles = new Rectangle[rowCount][columnCount];
+        final Rectangle[][] rectangles = new Rectangle[rowCount][columnCount];
 
+        // creating cells and positioning them
         for (int i = 0; i < columnCount; i++) {
             for (int j = 0; j < rowCount; j++) {
                 final Rectangle rect = new Rectangle(rectangleSize, rectangleSize, CellRunner.getRandomColor());
                 rectangles[j][i] = rect;
+
+                // positioning the rectangles in the main pane with bindings
                 rect.layoutXProperty().bind(
                         root.widthProperty()
                                 .divide(columnCount)
@@ -118,6 +121,7 @@ public class Main extends Application {
             }
         }
 
+        // creating threads to run for each cell
         for (int i = 0; i < columnCount; i++) {
             for (int j = 0; j < rowCount; j++) {
                 threads.add(new Thread(new CellRunner(
@@ -141,9 +145,12 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Stops all the threads.
+     */
     @Override
     public void stop() {
-        if(threads != null) {
+        if (threads != null) {
             CellRunner.setRunning(false);
             for (Thread thread : threads) {
                 try {
