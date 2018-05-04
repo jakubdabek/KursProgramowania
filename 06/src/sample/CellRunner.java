@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+
 /**
  * Class responsible for managing the color of one cell
  *
@@ -89,7 +90,7 @@ public class CellRunner implements Runnable {
         synchronized (System.err) {
             System.err.format("Thread %d started\n", id);
         }
-        while (running.get()) {
+        while (running.get() && !Thread.interrupted()) {
             if (ThreadLocalRandom.current().nextDouble() < randomColorChance) {
                 Platform.runLater(() -> rectangle.setFill(getRandomColor()));
             } else {
@@ -103,12 +104,12 @@ public class CellRunner implements Runnable {
                 });
             }
             try {
-                Thread.sleep(ThreadLocalRandom.current().nextLong(defaultDelay + 1) + defaultDelay / 2);
+                Thread.sleep(ThreadLocalRandom.current().nextLong(defaultDelay + 1L) + defaultDelay / 2L);
             } catch (InterruptedException ex) {
                 synchronized (System.err) {
-                    System.err.format("Thread %d interrupted. Well, it happens ¯\\_(ツ)_/¯", id);
-                    System.err.println(ex.getLocalizedMessage());
+                    System.err.format("Thread %d interrupted\n", id);
                 }
+                Thread.currentThread().interrupt();
             }
         }
         synchronized (System.err) {
