@@ -91,6 +91,16 @@ public class CellRunner implements Runnable {
             System.err.format("Thread %d started\n", id);
         }
         while (running.get() && !Thread.interrupted()) {
+            try {
+                Thread.sleep(ThreadLocalRandom.current().nextLong(defaultDelay + 1L) + defaultDelay / 2L);
+            } catch (InterruptedException ex) {
+                synchronized (System.err) {
+                    System.err.format("Thread %d interrupted\n", id);
+                }
+                Thread.currentThread().interrupt();
+                break;
+            }
+            Platform.runLater(() -> rectangle.setStroke(null));
             if (ThreadLocalRandom.current().nextDouble() < randomColorChance) {
                 Platform.runLater(() -> rectangle.setFill(getRandomColor()));
             } else {
@@ -102,14 +112,6 @@ public class CellRunner implements Runnable {
 
                     rectangle.setFill(getAverageColor(colors));
                 });
-            }
-            try {
-                Thread.sleep(ThreadLocalRandom.current().nextLong(defaultDelay + 1L) + defaultDelay / 2L);
-            } catch (InterruptedException ex) {
-                synchronized (System.err) {
-                    System.err.format("Thread %d interrupted\n", id);
-                }
-                Thread.currentThread().interrupt();
             }
         }
         synchronized (System.err) {

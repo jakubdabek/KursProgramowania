@@ -3,9 +3,15 @@ package sample;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -50,7 +56,20 @@ public class Main extends Application {
         return neighbours;
     }
 
+    /**
+     * Keeps all threads.
+     */
     private static List<Thread> threads;
+
+    /**
+     * To be locked on any modification to {@link Main#threads}
+     */
+    private static final Object threadsListLock = new Object();
+
+    /**
+     * Keeps all {@link CellRunner}s. They can be reused after stopping containing threads.
+     */
+    private static List<CellRunner> runners;
 
     /**
      * Parses arguments, creates the cells, initiates threads and starts their execution.
@@ -93,7 +112,6 @@ public class Main extends Application {
         }
 
         final Pane root = new Pane();
-        threads = new ArrayList<>(columnCount * rowCount);
         final Rectangle[][] rectangles = new Rectangle[rowCount][columnCount];
 
         // creating cells and positioning them
@@ -122,15 +140,21 @@ public class Main extends Application {
         }
 
         // creating threads to run for each cell
+        runners = new ArrayList<>(columnCount * rowCount);
+        threads = new ArrayList<>(columnCount * rowCount);
         for (int i = 0; i < columnCount; i++) {
             for (int j = 0; j < rowCount; j++) {
-                threads.add(new Thread(new CellRunner(
+                final Rectangle currentRectangle = rectangles[j][i];
+                final CellRunner currentRunner = new CellRunner(
                         i * rowCount + j,
-                        rectangles[j][i],
+                        currentRectangle,
                         getNeighbours(rectangles, j, i),
                         defaultDelay,
                         randomColorChance
-                )));
+                );
+                currentRectangle.setOnMouseClicked(new RectangleOnClickHandler(threads.size()));
+                runners.add(currentRunner);
+                threads.add(new Thread(currentRunner));
             }
         }
 
@@ -139,6 +163,8 @@ public class Main extends Application {
         primaryStage.sizeToScene();
         primaryStage.show();
 
+        primaryStage.addEventHandler(KeyEvent.KEY_PRESSED, pauseHandler);
+
         CellRunner.setRunning(true);
         for (Thread thread : threads) {
             thread.start();
@@ -146,20 +172,130 @@ public class Main extends Application {
     }
 
     /**
-     * Stops all the threads.
+     * Current pause state.
+     */
+    private static boolean paused = false;
+
+    /**
+     * Event handler for pausing. Activated on clicking the "P" key.
+     */
+    private final EventHandler<KeyEvent> pauseHandler = new EventHandler<>() {
+
+        /**
+         * Pauses or unpauses the field depending on {@link Main#paused}.
+         */
+        @Override
+        public void handle(KeyEvent event) {
+            if (event.getCode().equals(KeyCode.P)) {
+                if (paused) {
+                    // don't block main thread
+                    new Thread(() -> {
+                        synchronized (threadsListLock) {
+                            // creating a new ArrayList is faster than clearing each element; let GC do its work
+                            threads = new ArrayList<>(threads.size());
+                            for (CellRunner runner : runners) {
+                                threads.add(new Thread(runner));
+                            }
+                            // restart all threads
+                            CellRunner.setRunning(true);
+                            for (Thread thread : threads) {
+                                thread.start();
+                            }
+                        }
+                    }).start();
+                    paused = false;
+                } else {
+                    // pause (stop) all threads
+                    CellRunner.setRunning(false);
+                    // don't block main thread
+                    new Thread(() -> {
+                        synchronized (threadsListLock) {
+                            for (Thread thread : threads) {
+                                try {
+                                    thread.interrupt();
+                                    thread.join();
+                                } catch (InterruptedException ex) {
+                                    System.err.println(ex.getLocalizedMessage());
+                                }
+                            }
+                        }
+                    }).start();
+
+                    paused = true;
+                }
+            }
+        }
+    };
+
+    /**
+     * Class that handles pausing individual rectangles by clicking on them.
+     */
+    private class RectangleOnClickHandler implements EventHandler<MouseEvent> {
+
+        /**
+         * Corresponding cell's index.
+         */
+        private final int index;
+
+        RectangleOnClickHandler(int index) {
+            this.index = index;
+        }
+
+        /**
+         * Pauses the rectangle and puts a {@link Color#RED red} border around it.
+         * Doesn't work when the whole field is {@link Main#paused paused}.
+         */
+        @Override
+        public void handle(MouseEvent event) {
+            if (!paused) {
+                // don't block main thread
+                new Thread(() -> {
+                    synchronized (threadsListLock) {
+                        final Thread relevantThread = threads.get(index);
+                        if (relevantThread.isAlive() && !relevantThread.isInterrupted()) {
+                            try {
+                                relevantThread.interrupt();
+                                relevantThread.join();
+                                // put a border around the rectangle to make it stick out
+                                Platform.runLater(() -> {
+                                    final Rectangle rectangle = ((Rectangle) event.getSource());
+                                    rectangle.setStroke(Color.RED);
+                                    rectangle.setStrokeWidth(3.5);
+                                    rectangle.setStrokeType(StrokeType.INSIDE);
+                                });
+                            } catch (InterruptedException ex) {
+                                synchronized (System.err) {
+                                    System.err.println("Thread handling single rectangle pause interrupted");
+                                }
+                            }
+                        } else {
+                            final Thread newThread = new Thread(runners.get(index));
+                            threads.set(index, newThread);
+                            newThread.start();
+                        }
+                    }
+                }).start();
+            }
+        }
+    }
+
+    /**
+     * Stops all threads.
      */
     @Override
     public void stop() {
-        if (threads != null) {
-            CellRunner.setRunning(false);
-            for (Thread thread : threads) {
-                try {
-                    thread.join();
-                } catch (InterruptedException ex) {
-                    System.err.println(ex.getLocalizedMessage());
+        synchronized (threadsListLock) {
+            if (threads != null) {
+                CellRunner.setRunning(false);
+                for (Thread thread : threads) {
+                    try {
+                        thread.join();
+                    } catch (InterruptedException ex) {
+                        System.err.println(ex.getLocalizedMessage());
+                    }
                 }
+                System.err.println("All threads finished");
             }
-            System.err.println("All threads finished");
         }
     }
 
