@@ -4,6 +4,7 @@
 *.out
 *.class
 *.exe
+*.jar
 out/
 
 # debug and analysis output
