@@ -14,31 +14,43 @@ class BTree
 private:
     struct Node
     {
-        std::list<T> values;
-        std::list<std::shared_ptr<Node>> children;
+        std::list<std::pair<T, std::shared_ptr<Node>>> elements;
         std::weak_ptr<Node> parent;
 
         Node() = default;
 
-        void insert(T&&);
+        void print(std::ostream&, std::string prefix = " ") const noexcept;
+        bool contains(const T&) const noexcept;
 
-        template<typename... Args>
-        auto insert(Args&&...) -> std::enable_if_t<std::is_constructible<T, Args...>::value, std::shared_ptr<Node>>;
+        template<typename U>
+        bool insert(U&&, std::shared_ptr<Node>&& = {});
+
+        void split(bool update = false);
+
+        static bool is_leaf(const std::shared_ptr<Node>&);
+        static bool is_leaf(const Node&);
+        static const T& index(const std::shared_ptr<Node>&);
+        static const T& index(const Node&);
     };
 
 public:
-    BTree();
+    decltype(auto) insert(T&&);
+    decltype(auto) insert(const T&);
+    bool contains(const T&) const noexcept;
 
-    void insert(T&&);
+    void print(std::ostream&) const noexcept;
+    friend std::ostream& operator<<(std::ostream &os, const BTree &tree)
+    {
+        tree.print(os);
+        return os;
+    }
 
-    template<typename... Args>
-    auto insert(Args&&... args)
-        -> decltype(std::declval<Node>().insert(args...));
-        //-> std::enable_if_t<std::is_constructible<T, Args...>::value, std::shared_ptr<Node>>;
+private:
+    template<typename U>
+    decltype(auto) insert_impl(U&&);
 
 private:
     std::shared_ptr<Node> root;
-    Comparer comparer;
 };
 
 #include "BTree.tpp"
