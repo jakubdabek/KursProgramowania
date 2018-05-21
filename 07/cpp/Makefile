@@ -1,5 +1,5 @@
 CXX = clang++
-CXXFLAGS = -Wall -pedantic -std=c++1z
+CXXFLAGS = -Wall -pedantic -std=c++17
 CPPFILES := $(wildcard *.cpp)
 FILENAMES := $(patsubst %.cpp, %, $(CPPFILES))
 
@@ -9,5 +9,5 @@ program: program.cpp
 
 program.cpp: BTree.hpp
 	@touch $@
-BTree.hpp: BTree.tpp
+BTree.hpp: BTree.tpp BTree_Node.tpp
 	@touch $@
