@@ -129,6 +129,26 @@ void user_interface(BTree<T> tree)
                     std::cout << value << " not found" << std::endl;
             }
         }
+        else if (query == "remove")
+        {
+            if (!(std::getline(std::cin, query)))
+                break;
+
+            std::istringstream stream{query};
+            while(stream >> value)
+            {
+                tree.remove(value);
+                std::cout << value << " removed" << std::endl;
+            }
+        }
+        else if (query == "clear")
+        {
+            std::cout << "Do you really want to clear the whole tree? [Yes/No]" << std::endl;
+            std::string confirmation;
+            std::cin >> confirmation;
+            if (confirmation == "Yes")
+                tree.clear();
+        }
         else if (query == "p" || query == "print")
         {
             std::cout << tree << std::endl;
@@ -139,7 +159,7 @@ void user_interface(BTree<T> tree)
         }
         else
         {
-            std::cout << "Enter (\"insert\"|\"find\"|\"contains\") and a value, or \"print\"." << std::endl;
+            std::cout << "Enter (\"(i)nsert\"|\"(f)ind\"|\"contains\") and a value, \"clear\" or \"(p)rint\"." << std::endl;
             std::cout << "\"(q)uit\" or \"e(x)it\" to end" << std::endl;
         }
     }

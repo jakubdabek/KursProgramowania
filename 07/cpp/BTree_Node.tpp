@@ -49,7 +49,7 @@ inline void BTree<T, Comparer>::Node::print(std::ostream &os, std::string prefix
     bool isLeaf = is_leaf(*this);
     for (auto &&element : elements)
     {
-        os << prefix << element.first << "\n";
+        os << prefix << element.first << "  " << this << "  " << parent.lock().get() <<"\n";
         if (!isLeaf)
             element.second->print(os, prefix + "  ");
     }
@@ -139,6 +139,7 @@ inline void BTree<T, Comparer>::Node::split()
         newLeftNode->update_parents_of_elements();
         elements.emplace_front(index(newLeftNode), std::move(newLeftNode));
         elements.emplace_back(index(newNode), std::move(newNode));
+        update_parents_of_elements();
     }
 }
 
@@ -151,5 +152,119 @@ inline void BTree<T, Comparer>::Node::update_parents_of_elements() noexcept
         {
             element.second->parent = this->weak_from_this();
         }
+    }
+}
+
+template <typename T, typename Comparer>
+inline void BTree<T, Comparer>::Node::update_index() noexcept
+{
+    std::cerr << "updating "; ::print(std::cerr, elements);
+    for (auto &&element : elements)
+    {
+        auto newIndex = index(element.second);
+        if (!::equal(newIndex, element.first, Comparer{}))
+        {
+            std::cerr << "specific update " << element.first << std::endl;
+            element.first = std::move(newIndex);
+            if (auto _parent = parent.lock())
+            {
+                _parent->update_index();
+            }
+        }
+    }
+}
+
+template <typename T, typename Comparer>
+inline void BTree<T, Comparer>::Node::remove(const T &value, bool inner)
+{
+    Comparer cmp;
+    auto valuePosition = std::find_if(elements.begin(), elements.end(), [&](auto &&elem) { return cmp(value, elem.first); });
+
+    if (valuePosition == elements.begin())
+        return;
+
+    --valuePosition;
+
+    if (is_leaf(*this) || inner)
+    {
+        if (::equal(valuePosition->first, value, cmp))
+        {
+            elements.erase(valuePosition);
+            if (inner)
+                update_parents_of_elements();
+
+            if (auto _parent = parent.lock())
+            {
+                auto &parentElements = _parent->elements;
+                auto thisIter = std::find_if(
+                    parentElements.begin(),
+                    parentElements.end(),
+                    [&](auto &&elem) { return elem.second.get() == this; });
+
+                if (inner)
+                    _parent->update_index();
+                else
+                    thisIter->first = index(thisIter->second);
+
+                if (elements.size() < ((maxCapacity + 1) / 2))
+                {
+                    if (parentElements.size() == 1)
+                    {
+                        // this is the only element in parent
+                        std::cerr << "Something is wrong!?" << std::endl;
+                        return;
+                    }
+
+                    auto it = thisIter;
+                    ++it;
+
+                    if (it != parentElements.end())
+                    {
+                        auto &siblingElements = it->second->elements;
+                        int itemsToTransfer = siblingElements.size() - ((maxCapacity + 1) / 2);
+                        if (itemsToTransfer > 0)
+                        {
+                            auto siblingIt = siblingElements.begin();
+                            std::advance(siblingIt, itemsToTransfer);
+                            elements.splice(elements.end(), siblingElements, siblingElements.begin(), siblingIt);
+                            update_parents_of_elements();
+                            _parent->update_index();
+                            //it->first = index(it->second);
+                        }
+                        else
+                        {
+                            elements.splice(elements.end(), siblingElements);
+                            update_parents_of_elements();
+                            _parent->remove(it->first, true);
+                        }
+                    }
+                    else
+                    {
+                        ----it; // it points to a sibling before this
+                        auto &siblingElements = it->second->elements;
+                        int itemsToTransfer = siblingElements.size() - ((maxCapacity + 1) / 2);
+                        if (itemsToTransfer > 0)
+                        {
+                            auto siblingIt = siblingElements.begin();
+                            std::advance(siblingIt, (maxCapacity + 1) / 2);
+                            elements.splice(elements.begin(), siblingElements, siblingIt, siblingElements.end());
+                            update_parents_of_elements();
+                            //thisIter->first = index(thisIter->second);
+                            _parent->update_index();
+                        }
+                        else
+                        {
+                            siblingElements.splice(siblingElements.begin(), elements);
+                            it->second->update_parents_of_elements();
+                            _parent->remove(thisIter->first, true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        valuePosition->second->remove(value);
     }
 }

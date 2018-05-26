@@ -7,23 +7,6 @@
 #include <memory>
 
 
-namespace
-{
-template <typename T, typename U>
-inline void print(const std::list<std::pair<T, U>> &list)
-{
-    std::cout << "[";
-    char delim[] = "\0 ";
-    for (auto &&element : list)
-    {
-        std::cout << delim << element.first;
-        delim[0] = ',';
-    }
-    std::cout << "]" << std::endl;
-}
-} // namespace
-
-
 template <typename T, typename Comparer>
 inline void BTree<T, Comparer>::print(std::ostream &os) const noexcept
 {
@@ -69,4 +52,20 @@ inline decltype(auto) BTree<T, Comparer>::insert_impl(U &&value)
     }
 
     return root->insert(std::forward<U>(value));
+}
+
+template <typename T, typename Comparer>
+inline void BTree<T, Comparer>::remove(const T &value)
+{
+    if (maxCapacity <= 2)
+    {
+        std::cerr << "Removing elements doesn't work when max capacity is less than 3" << std::endl;
+        return;
+    }
+    if (root)
+    {
+        root->remove(value);
+        while (root->elements.size() == 1)
+            root = root->elements.front().second;
+    }
 }

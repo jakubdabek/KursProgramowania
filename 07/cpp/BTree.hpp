@@ -30,6 +30,9 @@ class BTree
             noexcept(std::is_nothrow_copy_assignable<T>::value && std::is_nothrow_copy_constructible<T>::value);
         void update_parents_of_elements() noexcept;
 
+        void remove(const T&, bool = false); // TODO: noexcept
+        void update_index() noexcept;
+
         static bool is_leaf(const std::shared_ptr<Node>&) noexcept;
         static bool is_leaf(const Node&) noexcept;
         static const T& index(const std::shared_ptr<Node>&) noexcept;
@@ -47,7 +50,8 @@ class BTree
 
     decltype(auto) insert(T&&) noexcept(noexcept(insert_impl(std::declval<T>())));
     decltype(auto) insert(const T&) noexcept(noexcept(insert_impl(std::declval<const T&>())));
-    void clear() noexcept { root = nullptr; }
+    void remove(const T&); // TODO: noexcept
+    void clear() noexcept { root.reset(); }
     bool contains(const T&) const noexcept;
 
     void print(std::ostream&) const noexcept;
@@ -69,5 +73,6 @@ class BTree
     std::shared_ptr<Node> root;
 };
 
+#include "utility.hpp"
 #include "BTree_Node.tpp"
 #include "BTree.tpp"
