@@ -53,10 +53,10 @@ public class Main extends Application {
             }
             primaryStage.close();
         });
+        startButton.setDefaultButton(true);
         HBox fuck = new HBox();
         fuck.getChildren().add(startButton);
         fuck.setAlignment(Pos.CENTER);
-        //startButton.setAlignment(Pos.CENTER);
         root.getChildren().addAll(clientRadioButton, serverRadioButton, fuck);
 
         primaryStage.setResizable(false);

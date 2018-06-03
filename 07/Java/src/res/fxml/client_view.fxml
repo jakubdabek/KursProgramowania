@@ -27,7 +27,8 @@
             <MenuItem text="New server" onAction="#newServerMenuItem_onAction"/>
         </Menu>
     </MenuBar>
-    <Label text="port:" GridPane.rowIndex="1" GridPane.columnIndex="0">
+    <Label GridPane.rowIndex="1" GridPane.columnIndex="0"
+           text="port:" disable="${portNumberTextField.disable}">
         <GridPane.margin>
             <Insets left="20"/>
         </GridPane.margin>
@@ -35,22 +36,26 @@
     <TextField fx:id="portNumberTextField" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="LEFT"
                onAction="#startClient"/>
 
-    <Label text="host address:" GridPane.rowIndex="2" GridPane.columnIndex="0">
+    <Label GridPane.rowIndex="2" GridPane.columnIndex="0"
+           text="host address:" disable="${hostAddressTextField.disable}">
         <GridPane.margin>
             <Insets left="20"/>
         </GridPane.margin>
     </Label>
     <TextField fx:id="hostAddressTextField" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.halignment="LEFT"
                text="localhost" onAction="#startClient"/>
-    <Button fx:id="startButton" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="CENTER"
+    <Button fx:id="startButton" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2"
+            GridPane.halignment="CENTER"
             text="Start" defaultButton="true" onAction="#startClient"/>
     <Separator GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
-    <TextField fx:id="commandTextField" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="3" disable="true">
+    <TextField fx:id="commandTextField" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="3"
+               onAction="#sendCommand" disable="true">
         <GridPane.margin>
             <Insets top="5" right="8" bottom="0" left="8"/>
         </GridPane.margin>
     </TextField>
-    <TextArea fx:id="outputTextField" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="3" disable="true" editable="false">
+    <TextArea fx:id="outputTextField" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="3"
+              disable="true" editable="false">
         <GridPane.margin>
             <Insets top="0" right="8" bottom="8" left="8"/>
         </GridPane.margin>

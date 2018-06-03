@@ -1,16 +1,21 @@
 package com.dabek.jakub.bpptree.clientserver;
 
+import com.dabek.jakub.bpptree.Utility;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.dabek.jakub.bpptree.clientserver.ServerController.DEFAULT_PORT;
 
@@ -80,50 +85,94 @@ public class ClientController {
         }
 
         portNumberTextField.setText(Integer.toString(port));
-        System.err.println(port);
-        System.err.println(portNumberTextField.getText());
         if (!good) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Port must be a positive integer. Leave empty for default (" + DEFAULT_PORT + ")");
-            alert.setTitle("Wrong port number");
-            alert.showAndWait();
+            Utility.createAlert(
+                    Alert.AlertType.ERROR,
+                    "Wrong port number",
+                    "Port must be a positive integer. Leave empty for default (" + DEFAULT_PORT + ")"
+            ).showAndWait();
         }
         return good;
     }
 
+    private ClientThread currentClientThread;
+
     private class ClientThread extends Thread {
-
-        private Socket socket;
-
-        public ClientThread() throws IOException {
-            socket = new Socket(hostAddress, port);
-        }
+        AtomicBoolean ready = new AtomicBoolean(false);
+        volatile BufferedReader reader;
+        volatile PrintWriter writer;
 
         @Override
         public void run() {
-            while (!Thread.interrupted()) {
-
+            messageReceived("Opening connection...\n");
+            try (Socket socket = new Socket(hostAddress, port);
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(socket.getInputStream())));
+                 PrintWriter writer = new PrintWriter(new BufferedOutputStream(socket.getOutputStream()))) {
+                this.reader = reader;
+                this.writer = writer;
+                ready.set(true);
+                String line = null;
+                messageReceived("Connection established\n");
+                try {
+                    while (!Thread.interrupted() && (line = reader.readLine()) != null) {
+                        messageReceived(line + "\n");
+                    }
+                    if (line == null)
+                        messageReceived("Server closed the connection");
+                } catch (IOException e) {
+                    messageReceived("Error occurred in the connection");
+                }
+            } catch (Exception e) {
+                messageReceived("Error occurred while trying to connect\n");
+                Platform.runLater(() -> Utility.createAlert(Alert.AlertType.ERROR, "Error creating client", e.getMessage()).show());
+            } finally {
+                Platform.runLater(ClientController.this::stopClient);
             }
+            System.err.println("Client closing");
+        }
+
+        public synchronized void sendCommand(String command) {
+            if (ready.get() && !command.isEmpty()) {
+                writer.println(command);
+                writer.flush();
+            }
+        }
+
+        private void messageReceived(String message) {
+            Platform.runLater(() -> {
+                outputTextField.appendText(message);
+            });
         }
     }
 
-    private ClientThread currentClientThread;
+    @FXML
+    private void sendCommand() {
+        if (currentClientThread != null) {
+            currentClientThread.sendCommand(commandTextField.getText());
+            commandTextField.selectAll();
+        }
+    }
+
+    private void changeDisabled(boolean clientStarted) {
+        portNumberTextField.setDisable(clientStarted);
+        hostAddressTextField.setDisable(clientStarted);
+        startButton.setDisable(clientStarted);
+        commandTextField.setDisable(!clientStarted);
+        outputTextField.setDisable(!clientStarted);
+        if (clientStarted)
+            commandTextField.requestFocus();
+        else
+            portNumberTextField.requestFocus();
+    }
 
     @FXML
     private void startClient() {
-        System.err.println("Begin start");
         if (checkPort()) {
-            System.err.println("Start");
-            try {
-                currentClientThread = new ClientThread();
-                currentClientThread.start();
-                portNumberTextField.setDisable(true);
-                hostAddressTextField.setDisable(true);
-                startButton.setDisable(true);
-            } catch (Exception ex) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, ex.getMessage());
-                alert.setTitle("Error creating client socket");
-                alert.showAndWait();
-            }
+            commandTextField.clear();
+            outputTextField.clear();
+            currentClientThread = new ClientThread();
+            currentClientThread.start();
+            changeDisabled(true);
         }
     }
 
@@ -138,7 +187,10 @@ public class ClientController {
                     e.printStackTrace();
                 }
             }
+            commandTextField.clear();
+            currentClientThread = null;
         }
+        changeDisabled(false);
     }
 
     @FXML
