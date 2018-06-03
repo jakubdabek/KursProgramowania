@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.dabek.jakub.bpptree.clientserver.ClientController"
+          prefHeight="400.0" prefWidth="600.0" vgap="3" hgap="3">
+    <rowConstraints>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="ALWAYS"/>
+    </rowConstraints>
+    <columnConstraints>
+        <ColumnConstraints hgrow="NEVER"/>
+        <ColumnConstraints hgrow="SOMETIMES"/>
+        <ColumnConstraints hgrow="ALWAYS"/>
+    </columnConstraints>
+    <MenuBar GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="3">
+        <Menu text="Launch">
+            <MenuItem text="New client" onAction="#newClientMenuItem_onAction"/>
+            <MenuItem text="New server" onAction="#newServerMenuItem_onAction"/>
+        </Menu>
+    </MenuBar>
+    <Label text="port:" GridPane.rowIndex="1" GridPane.columnIndex="0">
+        <GridPane.margin>
+            <Insets left="20"/>
+        </GridPane.margin>
+    </Label>
+    <TextField fx:id="portNumberTextField" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="LEFT"
+               onAction="#startClient"/>
+
+    <Label text="host address:" GridPane.rowIndex="2" GridPane.columnIndex="0">
+        <GridPane.margin>
+            <Insets left="20"/>
+        </GridPane.margin>
+    </Label>
+    <TextField fx:id="hostAddressTextField" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.halignment="LEFT"
+               text="localhost" onAction="#startClient"/>
+    <Button fx:id="startButton" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="CENTER"
+            text="Start" defaultButton="true" onAction="#startClient"/>
+    <Separator GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
+    <TextField fx:id="commandTextField" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="3" disable="true">
+        <GridPane.margin>
+            <Insets top="5" right="8" bottom="0" left="8"/>
+        </GridPane.margin>
+    </TextField>
+    <TextArea fx:id="outputTextField" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="3" disable="true" editable="false">
+        <GridPane.margin>
+            <Insets top="0" right="8" bottom="8" left="8"/>
+        </GridPane.margin>
+    </TextArea>
+</GridPane>
