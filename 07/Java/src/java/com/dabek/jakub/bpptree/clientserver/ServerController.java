@@ -270,7 +270,7 @@ public class ServerController {
                             break;
                         case "remove":
                             logMessage("Removing " + argument);
-                            if (tree.add(argument)) {
+                            if (tree.remove(argument)) {
                                 callback.accept(argument + " removed");
                             } else {
                                 callback.accept("Could not remove " + argument);

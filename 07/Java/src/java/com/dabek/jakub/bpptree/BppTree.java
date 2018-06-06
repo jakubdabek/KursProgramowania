@@ -58,6 +58,16 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
             return children.isEmpty() ? null : children.get(0).value;
         }
 
+        int indexOfRelevantNodeForValue(T value) {
+            int index = indexOf(children, pair -> value.compareTo(pair.value) < 0);
+            if (index == -1) {
+                index = children.size() - 1;
+            } else if (index != 0){
+                index--;
+            }
+            return index;
+        }
+
         boolean add(T value) {
             return add(value, null);
         }
@@ -91,14 +101,9 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
                 }
                 return true;
             } else {
-                int index = indexOf(children, pair -> value.compareTo(pair.value) < 0);
+                int index = indexOfRelevantNodeForValue(value);
                 if (index == 0) {
-                    children.get(0).value = value;
-                    index = 0;
-                } else if (index == -1) {
-                    index = children.size() - 1;
-                } else {
-                    index--;
+                    children.get(index).value = value;
                 }
                 return children.get(index).child.add(value);
             }
@@ -112,8 +117,38 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
             }
         }
 
+        private void updateIndex() {
+            for (Pair pair : children) {
+                T newIndex = pair.child.getIndex();
+                if (newIndex.compareTo(pair.value) != 0){
+                    pair.value = newIndex;
+                    if (parent != null)
+                        parent.updateIndex();
+                }
+            }
+        }
+
         boolean remove(T value) {
-            throw new UnsupportedOperationException();
+            return remove(value, false);
+        }
+
+
+        boolean remove(T value, boolean inner) {
+            if (isLeaf() || inner) {
+                int index = indexOf(children, pair -> value.compareTo(pair.value) == 0);
+                if (index == -1)
+                    return false;
+                children.remove(index);
+                if (parent != null)
+                    parent.updateIndex();
+                if (children.size() < ((maxCapacity + 1) / 2)) {
+                    System.err.println("Collapsing the tree with too little elements not implemented");
+                    return true;
+                }
+                return true;
+            } else {
+                return children.get(indexOfRelevantNodeForValue(value)).child.remove(value);
+            }
         }
 
         boolean contains(T value) {
@@ -134,7 +169,7 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
 
         void toString(StringBuilder sb, int indent) {
             for (Pair pair : children) {
-                for (int i = 0; i < indent; i++) sb.append("  ");
+                for (int i = 0; i < indent; i++) sb.append("    ");
                 sb.append(pair.value);
                 sb.append('\n');
                 if (pair.child != null)
@@ -177,23 +212,33 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("remove not implemented");
+        if (root == null) return false;
+
+        if (root.remove((T) o)) {
+            size--;
+            if (root.children.isEmpty())
+                root = null;
+            return true;
+        }
+        return false;
     }
 
-    @SuppressWarnings("unckecked")
+    @SuppressWarnings("unchecked")
     @Override
     public boolean contains(Object o) {
         if (o == null || root == null)
             return false;
 
-        return root.contains((T)o);
+        return root.contains((T) o);
     }
 
     @Override
     public void clear() {
         root = null;
+        size = 0;
     }
 
     @Override
