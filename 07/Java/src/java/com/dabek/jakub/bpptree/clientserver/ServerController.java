@@ -1,5 +1,6 @@
 package com.dabek.jakub.bpptree.clientserver;
 
+import com.dabek.jakub.bpptree.BppTree;
 import com.dabek.jakub.bpptree.Utility;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -7,10 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -18,14 +16,34 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ServerController {
 
     static final int DEFAULT_PORT = 7171;
+    private static final List<String> VALID_COMMANDS = Arrays.asList(
+            "print",
+            "clear",
+            "exit",
+            "contains",
+            "add",
+            "remove"
+    );
+
+    private static final List<String> NO_ARGUMENT_COMMANDS = VALID_COMMANDS.subList(0, 3);
 
     @FXML
     private TextField portNumberTextField;
+    @FXML
+    private ComboBox typeComboBox;
+    @FXML
+    private Spinner capacitySpinner;
     @FXML
     private Button startButton;
 
@@ -96,14 +114,22 @@ public class ServerController {
         return good;
     }
 
-    private ServerThread currentServerThread;
+    private ServerThread<?> currentServerThread;
 
-    private class ServerThread extends Thread {
+    private class ServerThread<T extends Comparable<T>> extends Thread {
         AtomicBoolean ready = new AtomicBoolean(false);
         volatile BufferedReader reader;
         volatile PrintWriter writer;
         volatile ServerSocket serverSocket;
         volatile Socket socket;
+
+        BppTree<T> tree;
+        Function<String, T> converter;
+
+        ServerThread(Function<String, T> converter) {
+            tree = new BppTree<>((Integer)capacitySpinner.getValue());
+            this.converter = converter;
+        }
 
         @Override
         public void run() {
@@ -135,10 +161,15 @@ public class ServerController {
             System.err.println("Client closing");
         }
 
-        private void sendMessage(String command) {
-            if (ready.get() && !command.isEmpty()) {
-                writer.println(command);
-                writer.flush(); //TODO: non-blocking flush
+        private void sendMessage(String message) {
+            sendMessage(message, true);
+        }
+
+        private void sendMessage(String message, boolean flush) {
+            if (ready.get() && !message.isEmpty()) {
+                writer.println(message);
+                if (flush)
+                    writer.flush(); //TODO: non-blocking flush
             }
         }
 
@@ -147,9 +178,114 @@ public class ServerController {
                 processCommand(command, false);
         }
 
-        private void processCommand(String command, boolean external) {
-            logMessage("Command received: " + command);
+        private String commandAwaitingConfirmation = null;
 
+        private void processCommand(String line, boolean external) {
+            try {
+                String command;
+                Consumer<String> callback = external ? this::sendMessage : this::logMessage;
+                String[] words = line.split("\\s+");
+                System.err.println(Arrays.toString(words));
+                if (commandAwaitingConfirmation == null) {
+                    logMessage("Command received: " + line);
+                    if (words.length == 0) {
+                        logMessage("Empty command, doing nothing");
+                        callback.accept("Invalid empty command\n" + "Enter one of the following: " + VALID_COMMANDS);
+                        return;
+                    }
+                    if (!VALID_COMMANDS.contains(words[0])) {
+                        logMessage("Unrecognized command, doing nothing");
+                        callback.accept("Unrecognized command\n" + "Enter one of the following: " + VALID_COMMANDS);
+                        return;
+                    }
+                    if (words.length == 1 && !NO_ARGUMENT_COMMANDS.contains(words[0])) {
+                        logMessage("No arguments, doing nothing");
+                        callback.accept("Command should have arguments\n" + "Enter them after the command, separated by spaces e.g. \"insert a b c\"");
+                        return;
+                    }
+
+                    command = words[0];
+                } else {
+                    command = commandAwaitingConfirmation;
+                }
+
+                List<T> arguments = Arrays.asList(words).subList(1, words.length).stream().map(converter).collect(Collectors.toList());
+
+                switch (command) {
+                    case "print":
+                        String stringRepresentation = tree.toString();
+                        logMessage("Printing tree");
+                        logMessage(stringRepresentation);
+                        if (external)
+                            callback.accept(stringRepresentation);
+                        return;
+                    case "clear":
+                        if (commandAwaitingConfirmation == null) {
+                            logMessage("Clear requested, awaiting confirmation");
+                            callback.accept("Enter \"Confirm\" to clear tree");
+                            commandAwaitingConfirmation = "clear";
+                        } else if (line.equals("Confirm")) {
+                            tree.clear();
+                            logMessage("Tree cleared");
+                            if (external)
+                                callback.accept("Tree cleared");
+                            commandAwaitingConfirmation = null;
+                        } else {
+                            logMessage("Operation canceled");
+                            commandAwaitingConfirmation = null;
+                        }
+                        return;
+                    case "exit":
+                        if (commandAwaitingConfirmation == null) {
+                            logMessage("Exit requested, awaiting confirmation");
+                            callback.accept("Enter \"Confirm\" to exit");
+                            commandAwaitingConfirmation = "exit";
+                        } else if (line.equals("Confirm")) {
+                            logMessage("Exiting...");
+                            Platform.runLater(ServerController.this::stopServer);
+                            commandAwaitingConfirmation = null;
+                        } else {
+                            logMessage("Operation canceled");
+                            commandAwaitingConfirmation = null;
+                        }
+                        return;
+                }
+                for (T argument : arguments) {
+                    switch (command) {
+                        case "contains":
+                            logMessage("Checking whether " + argument + " exists in the tree");
+                            if (tree.contains(argument)) {
+                                callback.accept(argument + " exists within the tree");
+                            } else {
+                                callback.accept(argument + " doesn't exist within the tree");
+                            }
+                            break;
+                        case "add":
+                            logMessage("Adding " + argument);
+                            if (tree.add(argument)) {
+                                callback.accept(argument + " added");
+                            } else {
+                                callback.accept("Could not add " + argument);
+                            }
+                            break;
+                        case "remove":
+                            logMessage("Removing " + argument);
+                            if (tree.add(argument)) {
+                                callback.accept(argument + " removed");
+                            } else {
+                                callback.accept("Could not remove " + argument);
+                            }
+                            break;
+                    }
+                }
+            } catch (Exception e) {
+                logMessage("Error occurred while processing command");
+                logMessage(e.toString());
+                e.printStackTrace();
+                if (external) {
+                    sendMessage("Error occurred while processing command");
+                }
+            }
         }
 
         private void logMessage(String message) {
@@ -185,6 +321,8 @@ public class ServerController {
     private void changeDisabled(boolean serverStarted) {
         portNumberTextField.setDisable(serverStarted);
         startButton.setDisable(serverStarted);
+        typeComboBox.setDisable(serverStarted);
+        capacitySpinner.setDisable(serverStarted);
         commandTextField.setDisable(!serverStarted);
         outputTextField.setDisable(!serverStarted);
         if (serverStarted)
@@ -198,7 +336,20 @@ public class ServerController {
         if (checkPort()) {
             commandTextField.clear();
             outputTextField.clear();
-            currentServerThread = new ServerThread();
+            switch ((String)typeComboBox.getValue()) {
+                case "Integer":
+                    currentServerThread = new ServerThread<>(Integer::parseInt);
+                    break;
+                case "Double":
+                    currentServerThread = new ServerThread<>(Double::parseDouble);
+                    break;
+                case "String":
+                    currentServerThread = new ServerThread<>(Function.identity());
+                    break;
+                default:
+                    Utility.createAlert(Alert.AlertType.ERROR, "What", "Wrong type. Contact FBI and tell them how you did that.").showAndWait();
+                    return;
+            }
             currentServerThread.start();
             changeDisabled(true);
         }

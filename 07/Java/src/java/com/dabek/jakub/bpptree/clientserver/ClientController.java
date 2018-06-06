@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.dabek.jakub.bpptree.clientserver.ServerController.DEFAULT_PORT;
@@ -45,7 +46,7 @@ public class ClientController {
             stage.setScene(new Scene(root));
             stage.setOnCloseRequest(event -> {
                 controller.stopClient();
-                Platform.exit();
+                stage.close();
             });
             stage.show();
         } catch (IOException e) {
@@ -101,29 +102,30 @@ public class ClientController {
         AtomicBoolean ready = new AtomicBoolean(false);
         volatile BufferedReader reader;
         volatile PrintWriter writer;
+        volatile Socket socket;
 
         @Override
         public void run() {
-            messageReceived("Opening connection...\n");
-            try (Socket socket = new Socket(hostAddress, port);
-                 BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(socket.getInputStream())));
-                 PrintWriter writer = new PrintWriter(new BufferedOutputStream(socket.getOutputStream()))) {
-                this.reader = reader;
-                this.writer = writer;
+            logMessage("Opening connection...");
+            try (Socket socket = this.socket = new Socket(hostAddress, port);
+                 BufferedReader reader = this.reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(socket.getInputStream())));
+                 PrintWriter writer = this.writer = new PrintWriter(new BufferedOutputStream(socket.getOutputStream()))) {
                 ready.set(true);
                 String line = null;
-                messageReceived("Connection established\n");
+                logMessage("Connection established\n");
                 try {
                     while (!Thread.interrupted() && (line = reader.readLine()) != null) {
-                        messageReceived(line + "\n");
+                        logMessage(line);
                     }
                     if (line == null)
-                        messageReceived("Server closed the connection");
+                        logMessage("\nServer closed the connection");
                 } catch (IOException e) {
-                    messageReceived("Error occurred in the connection");
+                    logMessage("\nError occurred in the connection");
                 }
+            } catch (SocketException e) {
+                System.err.println(e.getMessage());
             } catch (Exception e) {
-                messageReceived("Error occurred while trying to connect\n");
+                logMessage("\nError occurred while trying to connect");
                 Platform.runLater(() -> Utility.createAlert(Alert.AlertType.ERROR, "Error creating client", e.getMessage()).show());
             } finally {
                 Platform.runLater(ClientController.this::stopClient);
@@ -138,10 +140,19 @@ public class ClientController {
             }
         }
 
-        private void messageReceived(String message) {
+        private void logMessage(String message) {
             Platform.runLater(() -> {
-                outputTextField.appendText(message);
+                outputTextField.appendText(message + "\n");
             });
+        }
+
+        @Override
+        public void interrupt() {
+            try {
+                if (socket != null)
+                    socket.close();
+            } catch (IOException e) { e.printStackTrace(); }
+            super.interrupt();
         }
     }
 

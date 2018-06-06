@@ -21,15 +21,15 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
 
-        BppTree<Integer> tree = new BppTree<>(Arrays.asList(1, 10, 20, 30, 40));
-        System.out.println(tree);
-        Scanner scanner = new Scanner(System.in);
-
-//        while (scanner.hasNextInt()) {
-//            int value = scanner.nextInt();
-//            tree.add(value);
-//            System.out.println(tree);
-//        }
+//        BppTree<Integer> tree = new BppTree<>(Arrays.asList(1, 10, 20, 30, 40));
+//        System.out.println(tree);
+//        Scanner scanner = new Scanner(System.in);
+//
+////        while (scanner.hasNextInt()) {
+////            int value = scanner.nextInt();
+////            tree.add(value);
+////            System.out.println(tree);
+////        }
     }
 
     @Override

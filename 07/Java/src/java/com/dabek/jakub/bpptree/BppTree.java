@@ -8,27 +8,10 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
     private int size;
     private Node root;
 
-    private class BppTreeIterator implements Iterator<T> {
-
-        @Override
-        public boolean hasNext() {
-            return false;
-        }
-
-        @Override
-        public T next() {
-            return null;
-        }
-
-        @Override
-        public void remove() {
-
-        }
-    }
 
     @Override
     public Iterator<T> iterator() {
-        return new BppTreeIterator();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -86,13 +69,15 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
                 if (indexOf(children, pair -> (pair.value.compareTo(value) == 0)) != -1)
                     return false;
                 children.add(new Pair(value, node));
+                if (node != null)
+                    node.parent = this;
                 children.sort(null);
                 if (children.size() > maxCapacity) {
                     Node newNode = new Node();
-                    for (int i = (maxCapacity + 1) / 2 + 1; i < children.size(); i++) {
-                        newNode.children.add(children.get(i));
-                    }
-                    children.subList((maxCapacity + 1) / 2 + 1, children.size()).clear();
+                    List<Pair> toTransfer = children.subList((maxCapacity + 1) / 2, children.size());
+                    newNode.children.addAll(toTransfer);
+                    newNode.updateParentsOfElements();
+                    toTransfer.clear();
                     if (parent != null) {
                         parent.add(newNode.getIndex(), newNode);
                     } else {
@@ -106,23 +91,45 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
                 }
                 return true;
             } else {
-                int index = -1;
-                for (int i = 0; i < children.size(); i++) {
-                    if (value.compareTo(children.get(i).value) >= 0) {
-                        index = i;
-                        break;
-                    }
-                }
-                if (index == -1) {
+                int index = indexOf(children, pair -> value.compareTo(pair.value) < 0);
+                if (index == 0) {
                     children.get(0).value = value;
                     index = 0;
+                } else if (index == -1) {
+                    index = children.size() - 1;
+                } else {
+                    index--;
                 }
                 return children.get(index).child.add(value);
             }
         }
 
+        private void updateParentsOfElements() {
+            if (!isLeaf()) {
+                for (Pair pair : children) {
+                    pair.child.parent = this;
+                }
+            }
+        }
+
         boolean remove(T value) {
-            return true;
+            throw new UnsupportedOperationException();
+        }
+
+        boolean contains(T value) {
+            int index = -1;
+            for (int i = 0; i < children.size(); i++) {
+                if (value.compareTo(children.get(i).value) == 0) {
+                    return true;
+                } else if (value.compareTo(children.get(i).value) > 0) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                return false;
+            }
+            return isLeaf() && children.get(index).child.contains(value);
         }
 
         void toString(StringBuilder sb, int indent) {
@@ -136,48 +143,57 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
         }
     }
 
-    BppTree() {
+    public BppTree() {
         this.maxCapacity = 4;
     }
 
-    BppTree(int maxCapacity) {
+    public BppTree(int maxCapacity) {
         if (maxCapacity <= 0) throw new IllegalArgumentException("Max capacity must be positive");
         this.maxCapacity = maxCapacity;
     }
 
-    BppTree(Collection<? extends T> collection) {
+    public BppTree(Collection<? extends T> collection) {
         this.maxCapacity = 4;
         addAll(collection);
     }
 
-    BppTree(Collection<? extends T> collection, int maxCapacity) {
+    public BppTree(Collection<? extends T> collection, int maxCapacity) {
         this.maxCapacity = maxCapacity;
         addAll(collection);
     }
-
-
 
     @Override
     public boolean add(T value) {
         if (root == null) {
             root = new Node();
             root.children.add(new Pair(value));
+            size++;
             return true;
         }
-        return root.add(value);
+        if (root.add(value)) {
+            size++;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean remove(Object o) {
-        return true;
+        throw new UnsupportedOperationException("remove not implemented");
+    }
+
+    @SuppressWarnings("unckecked")
+    @Override
+    public boolean contains(Object o) {
+        if (o == null || root == null)
+            return false;
+
+        return root.contains((T)o);
     }
 
     @Override
-    public boolean contains(Object o) {
-        if (o == null)
-            return false;
-
-        return true;
+    public void clear() {
+        root = null;
     }
 
     @Override

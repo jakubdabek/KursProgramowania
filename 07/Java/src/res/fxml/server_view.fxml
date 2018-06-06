@@ -3,6 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.dabek.jakub.bpptree.clientserver.ServerController"
@@ -33,9 +35,27 @@
         </GridPane.margin>
     </Label>
     <TextField fx:id="portNumberTextField" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="LEFT"
-               onAction="#startServer"/>
+               onAction="#startServer" prefWidth="300"/>
     <Button fx:id="startButton" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.halignment="CENTER"
             text="Start" defaultButton="true" onAction="#startServer"/>
+    <ComboBox fx:id="typeComboBox" GridPane.rowIndex="1" GridPane.columnIndex="2"
+              GridPane.halignment="CENTER" prefWidth="${capacitySpinner.prefWidth}">
+        <items>
+            <FXCollections fx:factory="observableArrayList">
+                <String fx:value="Integer"/>
+                <String fx:value="Double"/>
+                <String fx:value="String"/>
+            </FXCollections>
+        </items>
+        <value>
+            <String fx:value="Double"/>
+        </value>
+    </ComboBox>
+    <Spinner fx:id="capacitySpinner" GridPane.rowIndex="2" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+        <valueFactory>
+            <SpinnerValueFactory.IntegerSpinnerValueFactory min="3" max="100"/>
+        </valueFactory>
+    </Spinner>
     <Separator GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
     <TextField fx:id="commandTextField" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="3"
                onAction="#processCommand" disable="true">
