@@ -141,8 +141,38 @@ public class BppTree<T extends Comparable<T>> extends AbstractCollection<T> {
                 children.remove(index);
                 if (parent != null)
                     parent.updateIndex();
-                if (children.size() < ((maxCapacity + 1) / 2)) {
-                    System.err.println("Collapsing the tree with too little elements not implemented");
+                if (children.size() < ((maxCapacity + 1) / 2) && parent != null) {
+                    int indexOfThisInParent = indexOf(parent.children, pair -> pair.child == this);
+                    if (indexOfThisInParent != parent.children.size() - 1) {
+                        Pair siblingPair = parent.children.get(indexOfThisInParent + 1);
+                        int toTransferAmount = siblingPair.child.children.size() - ((maxCapacity + 1) / 2);
+                        if(toTransferAmount > 0) {
+                            List<Pair> toTransfer = siblingPair.child.children.subList(0, toTransferAmount);
+                            children.addAll(toTransfer);
+                            updateParentsOfElements();
+                            toTransfer.clear();
+                            siblingPair.value = siblingPair.child.getIndex();
+                        } else {
+                            children.addAll(siblingPair.child.children);
+                            updateParentsOfElements();
+                            parent.remove(siblingPair.value, true);
+                        }
+                    } else {
+                        Pair siblingPair = parent.children.get(indexOfThisInParent - 1);
+                        int toTransferAmount = siblingPair.child.children.size() - ((maxCapacity + 1) / 2);
+                        if(toTransferAmount > 0) {
+                            List<Pair> toTransfer = siblingPair.child.children.subList(toTransferAmount - 1, siblingPair.child.children.size());
+                            children.addAll(toTransfer);
+                            updateParentsOfElements();
+                            toTransfer.clear();
+                            siblingPair.value = siblingPair.child.getIndex();
+                        } else {
+                            children.addAll(siblingPair.child.children);
+                            updateParentsOfElements();
+                            parent.remove(siblingPair.value, true);
+                            parent.updateIndex();
+                        }
+                    }
                     return true;
                 }
                 return true;
